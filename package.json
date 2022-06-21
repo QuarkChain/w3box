@@ -1,6 +1,6 @@
 {
-  "name": "go-ui",
-  "version": "0.1.0",
+  "name": "w3q-deploy-comment",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "./node_modules/.bin/vue-cli-service serve",

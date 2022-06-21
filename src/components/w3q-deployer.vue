@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import request from '../utils/request';
-import { noop } from '../utils/util';
+import request from '@/utils/request';
+import { noop } from '@/utils/util';
 import MyProgress from './progress';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
