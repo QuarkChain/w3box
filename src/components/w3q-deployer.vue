@@ -12,7 +12,7 @@
     <div v-else class="go-upload-trigger" @click="onClickTrigger">
       <slot></slot>
     </div>
-    <upload-list @on-delete="onDelete" @on-reUpload="onReUpload" :files="this.files"></upload-list>
+    <upload-list v-if="showList" @on-delete="onDelete" @on-reUpload="onReUpload" :files="this.files"></upload-list>
   </div>
 </template>
 
@@ -49,7 +49,11 @@ export default {
     // active drag and drop mode
     drag: {
       type: Boolean,
-      default: false
+      default: true
+    },
+    showList: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -176,6 +180,7 @@ export default {
     },
     onReUpload(file) {
       file.status = 'init';
+      file.percent = 0;
       this.onChange(file, this.files);
       this.normalizeReq(file);
       this.autoUpload();

@@ -49,10 +49,21 @@ const request = async ({
   onError,
   onProgress
 }) => {
-  if (!window.ethereum || !new ethers.providers.Web3Provider(window.ethereum).getSigner()) {
+  if (!window.ethereum) {
     onError(new Error("Can't find metamask"));
     return;
   }
+  try {
+    const address = await window.ethereum.enable();
+    if (!address) {
+      onError(new Error("Can't get Account"));
+      return;
+    }
+  } catch (e) {
+    onError(new Error("Can't get Account"));
+    return;
+  }
+
 
   const rawFile = file.raw;
   const content = await readFile(rawFile);
@@ -83,6 +94,7 @@ const request = async ({
     const hash = await fileContract.getChunkHash(hexName, index);
     if (localHash === hash) {
       console.log(`File ${name} chunkId: ${index}: The data is not changed.`);
+      onProgress({ percent: Number(index) + 1});
       continue;
     }
 
@@ -97,7 +109,7 @@ const request = async ({
         uploadState = false;
         break;
       }
-      onProgress({ percent: Number(index)});
+      onProgress({ percent: Number(index) + 1});
     } catch (e) {
       uploadState = false;
       break;
