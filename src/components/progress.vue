@@ -1,6 +1,8 @@
 <template>
-  <div class="progress">
-    <div ref="inner" class="progress-inner"></div>
+  <div class="group">
+    <div ref="inner" class="progress" v-for="index in chunks">
+      <div v-if="index - 1 < percent" class="progress-inner"></div>
+    </div>
   </div>
 </template>
 
@@ -11,35 +13,46 @@ export default {
     percent: {
       type: Number,
       default: 0
+    },
+    chunks: {
+      type: Number,
+      default: 1
     }
   },
   watch: {
-    percent: {
+    chunks: {
       handler (val) {
         this.$nextTick(() => {
-          this.$refs.inner.style.width = val + '%';
+          for (const v of this.$refs.inner) {
+            v.style.width = (1 / val * 100 - 0.1) + '%';
+          }
         });
       },
       immediate: true
     }
-  },
-  data () {
-    return {};
   },
 };
 </script>
 
 <style lang="scss" scoped>
 @import "../assets/styles/vars.scss";
+.group{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  width: 100%;
+}
 .progress {
   background-color: #eaeef4;
   border-radius: 100px;
   height: 6px;
+  transition: width 0.2s linear;
   .progress-inner {
     background-color: $primary;
     height: 100%;
+    width: 100%;
     border-radius: 100px;
-    transition: width 0.2s linear;
   }
 }
 </style>

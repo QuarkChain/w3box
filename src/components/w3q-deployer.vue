@@ -12,29 +12,29 @@
     <div v-else class="go-upload-trigger" @click="onClickTrigger">
       <slot></slot>
     </div>
-    <upload-list @on-delete="onDelete" :files="this.files"></upload-list>
+    <upload-list @on-delete="onDelete" @on-reUpload="onReUpload" :files="this.files"></upload-list>
   </div>
 </template>
 
 <script>
 import request from '@/utils/request';
-import { noop } from '@/utils/util';
 import MyProgress from './progress';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
+
+const noop = () => {};
 
 export default {
   name: 'w3q-deployer',
   components: { UploadDragger, UploadList, MyProgress },
   props: {
-    name: { type: String, default: 'file' },
-    fileList: {
-      type: Array,
-      default: () => []
-    },
-    action: {
+    fileContract: {
       type: String,
       required: true
+    },
+    dirPath: {
+      type: String,
+      default: ""
     },
     beforeUpload: { type: Function },
     onChange: { type: Function, default: noop },
@@ -42,29 +42,14 @@ export default {
     onError: { type: Function, default: noop },
     onProgress: { type: Function, default: noop },
     onExceed: { type: Function, default: noop },
-    data: { type: Object, default: () => ({}) },
     accept: { type: String },
     multiple: { type: Boolean, default: false },
-    customHttpRequest: { type: Function, default: request },
+    customRequestClint: { type: Function, default: request },
     limit: { type: Number },
     // active drag and drop mode
     drag: {
       type: Boolean,
       default: false
-    }
-  },
-  watch: {
-    // 用watch监听的问题，可以设置默认值，如何传入的fileList发生更改，会彻底覆盖组件中的files数据。
-    // 可以在onChange事件中对fileList进行赋值操作
-    fileList: {
-      handler (val) {
-        this.files = val.map(file => {
-          file.uid = file.uid || Date.now() + this.tempIndex++;
-          file.status = file.status || 'success';
-          return file;
-        });
-      },
-      immediate: true
     }
   },
   data () {
@@ -74,10 +59,15 @@ export default {
       // So need to set a auto increment value tempIndex to ensure uid is unique value
       tempIndex: 0,
       // store all uploading files xhr instance, so that can invoke xhr.abort to cancel upload request
-      reqs: {}
+      reqs: {},
+      currentReq: null
     };
   },
   methods: {
+    // event
+    onClickTrigger () {
+      this.$refs.input.click();
+    },
     onInputChange (e) {
       // e.target.files is pseudo array, need to convert to real array
       const rawFiles = Array.from(e.target.files);
@@ -90,38 +80,26 @@ export default {
       }
       this.startUpload(rawFiles);
     },
+
+    // init
     startUpload (rawFiles) {
-      rawFiles.forEach(rawFile => {
+      for (const rawFile of rawFiles) {
         const file = this.normalizeFiles(rawFile);
-        if (!this.beforeUpload || this.beforeUpload()) {
-          this.upload(file);
-        }
-      });
-    },
-    upload (file) {
-      const { uid } = file;
-      const options = {
-        url: this.action,
-        name: this.name,
-        file: file.raw,
-        data: this.data,
-        onSuccess: this.handleSuccess.bind(this, file),
-        onError: this.handleError.bind(this, file),
-        onProgress: this.handleProgress.bind(this, file)
-      };
-      file.status = 'pending';
-      this.onChange(file, this.files);
-      const req = this.customHttpRequest(options);
-      this.reqs[uid] = req;
-      if (req instanceof Promise) {
-        req.then(options.onSuccess, options.onError);
+        this.normalizeReq(file);
       }
+      // auto start upload
+      this.autoUpload();
     },
     normalizeFiles (rawFile) {
+      let chunkSize = 1;
+      if (rawFile.size > 475 * 1024) {
+        chunkSize = Math.ceil(rawFile.size / (475 * 1024));
+      }
       const file = {
         name: rawFile.name,
         size: rawFile.size,
         type: rawFile.type,
+        totalChunks: chunkSize,
         percent: 0,
         uid: Date.now() + this.tempIndex++,
         status: 'init', // value list: init pending success failure
@@ -131,39 +109,80 @@ export default {
       this.files.push(file);
       return file;
     },
-    handleError (file, error) {
+    normalizeReq (file) {
+      const { uid } = file;
+      this.reqs[uid] = {
+        contractAddress: this.fileContract,
+        dirPath: this.dirPath,
+        file: file,
+        onSuccess: this.handleSuccess.bind(this, file),
+        onError: this.handleError.bind(this, file),
+        onProgress: this.handleProgress.bind(this, file)
+      };
+    },
+    getFirstReq() {
+      const keys = Object.keys(this.reqs);
+      if (keys && keys.length > 0) {
+        return this.reqs[keys[0]];
+      }
+      return null;
+    },
+    async autoUpload() {
+      if(this.currentReq){
+        // is upload
+        return;
+      }
+      if (!this.beforeUpload || this.beforeUpload()) {
+        this.currentReq = this.getFirstReq();
+        while (this.currentReq) {
+          const options = this.currentReq;
+          const file = this.currentReq.file;
+          file.status = 'pending';
+          this.onChange(file, this.files);
+          await this.customRequestClint(options);
+
+          // next
+          this.currentReq = this.getFirstReq();
+        }
+      }
+    },
+
+    // fallback
+    handleError(file, error) {
       const { uid } = file;
       delete this.reqs[uid];
       file.status = 'failure';
       this.onError(error, file, this.files);
     },
-    handleSuccess (file, response) {
+    handleSuccess(file, response) {
       const { uid } = file;
       delete this.reqs[uid];
       file.status = 'success';
-      this.$set(file, 'response', response);
       // Not only front end can implement picture preview but also back end can do it. Here make use of back end api
-      this.$set(file, 'url', response.data.path);
+      this.$set(file, 'url', response.path);
       this.onChange(file, this.files);
       this.onSuccess(response, file, this.files);
     },
-    handleProgress (file, event) {
+    handleProgress(file, event) {
       file.percent = event.percent;
       this.onChange(file, this.files);
       this.onProgress(event, file, this.files);
     },
-    onClickTrigger () {
-      this.$refs.input.click();
-    },
+
     onDelete (file) {
       const i = this.files.indexOf(file);
       this.files.splice(i, 1);
       this.abort(file);
     },
+    onReUpload(file) {
+      file.status = 'init';
+      this.onChange(file, this.files);
+      this.normalizeReq(file);
+      this.autoUpload();
+    },
     abort (file) {
       const { uid } = file;
       if (this.reqs[uid]) {
-        this.reqs[uid].abort();
         delete this.reqs[uid];
       }
     }

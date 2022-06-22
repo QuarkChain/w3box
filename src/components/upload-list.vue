@@ -1,22 +1,31 @@
 <template>
   <div class="go-upload-list">
-    <div :class="['go-upload-list-item',file.status]" v-for="(file,i) in files" :key="file.uid">
+    <div :class="['go-upload-list-item',file.status]" v-for="(file) in files" :key="file.uid">
       <!--  FIXME:code in here is so chaos, can it become more elegance?  -->
       <div class="go-upload-list-item-img">
-        <update-icon v-if="file.status === 'pending'" class="go-upload-item-img-loading" name="loading"></update-icon>
+        <update-icon v-if="file.status === 'pending'" class="go-upload-item-img-loading" name="loading"/>
         <template v-else-if="file.status === 'success'">
           <img v-if="isImage(file.type)" class="go-upload-list-item-img" :src="file.url" alt="">
-          <update-icon v-else class="go-upload-item-file" name="file"></update-icon>
+          <update-icon v-else class="go-upload-item-file" name="file"/>
         </template>
-        <update-icon v-else class="go-upload-item-img-error" name="picture"></update-icon>
+        <update-icon v-else-if="file.status === 'failure'" class="go-upload-item-img-error" name="picture"/>
+        <update-icon v-else class="go-upload-item-file" name="file"/>
       </div>
+
       <div class="go-upload-list-item-name">
         <span>{{ file.name }}</span>
-        <my-progress v-if="file.status === 'pending'" :percent="file.percent"></my-progress>
+        <my-progress v-if="file.status === 'pending'" :percent="file.percent" :chunks="file.totalChunks"></my-progress>
       </div>
-      <span class="go-upload-list-item-delete" @click="onDelete(file)">
-          <update-icon name="delete"></update-icon>
-        </span>
+
+      <span v-if="file.status === 'success'" class="go-upload-list-item-delete" @click="onCopy(file.url)">
+          <update-icon name="copy"></update-icon>
+      </span>
+      <span v-if="file.status === 'failure'" class="go-upload-list-item-delete" @click="onUpload(file)">
+          <update-icon name="upload"></update-icon>
+      </span>
+      <span v-if="file.status !== 'pending'" class="go-upload-list-item-delete" @click="onDelete(file)">
+          <update-icon name="close"></update-icon>
+      </span>
     </div>
   </div>
 </template>
@@ -24,6 +33,7 @@
 <script>
 import UpdateIcon from "./icon";
 import MyProgress from './progress';
+const copy = require('clipboard-copy')
 
 export default {
   name: 'UploadList',
@@ -38,12 +48,18 @@ export default {
     return {};
   },
   methods: {
-    isImage (type) {
+    isImage(type) {
       if (!type) {return;}
       return type.includes('image');
     },
-    onDelete (file) {
+    onDelete(file) {
       this.$emit('on-delete', file);
+    },
+    onCopy(url) {
+      copy(url);
+    },
+    onUpload(file) {
+      this.$emit('on-reUpload', file);
     }
   }
 };
@@ -72,10 +88,14 @@ export default {
   }
   .go-upload-list-item-name {
     margin-left: 8px;
+    margin-right: 8px;
     flex: 1;
     @include ellipsis;
   }
   .go-upload-list-item-delete {
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
   }
   .go-upload-list-item-img {
@@ -90,7 +110,7 @@ export default {
     }
   }
   .go-upload-item-img-loading {
-    font-size: 20px;
+    font-size: 28px;
     @include spinner;
   }
   .go-upload-item-error,
