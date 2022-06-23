@@ -22,6 +22,8 @@ import MyProgress from './progress';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
 
+const sha3 = require('js-sha3').keccak_256;
+
 const noop = () => {};
 
 export default {
@@ -59,9 +61,6 @@ export default {
   data () {
     return {
       files: [],
-      // when multiple picture upload together, uid will same.
-      // So need to set a auto increment value tempIndex to ensure uid is unique value
-      tempIndex: 0,
       // store all uploading files xhr instance, so that can invoke xhr.abort to cancel upload request
       reqs: {},
       currentReq: null
@@ -78,11 +77,29 @@ export default {
       this.uploadFiles(rawFiles);
     },
     uploadFiles (rawFiles) {
+      rawFiles = this.clearFile(rawFiles);
       const filesLen = rawFiles.length + this.files.length;
       if (this.limit && this.limit < filesLen) {
         return this.onExceed(rawFiles, this.files);
       }
       this.startUpload(rawFiles);
+    },
+    clearFile(rawFiles) {
+      const newFiles = [];
+      for (const rawFile of rawFiles) {
+        const uid = sha3(rawFile.name + rawFile.size + rawFile.type);
+        let isExits = false;
+        for (const file of this.files) {
+          if (file.uid === uid) {
+            isExits = true;
+            break;
+          }
+        }
+        if (!isExits) {
+          newFiles.push(rawFile);
+        }
+      }
+      return newFiles;
     },
 
     // init
@@ -105,7 +122,7 @@ export default {
         type: rawFile.type,
         totalChunks: chunkSize,
         percent: 0,
-        uid: Date.now() + this.tempIndex++,
+        uid: sha3(rawFile.name + rawFile.size + rawFile.type),
         status: 'init', // value list: init pending success failure
         raw: rawFile
       };
