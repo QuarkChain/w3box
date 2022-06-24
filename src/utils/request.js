@@ -3,9 +3,7 @@ const sha3 = require('js-sha3').keccak_256;
 
 const FileContractInfo = {
   abi: [
-    "function write(bytes memory filename, bytes memory data) public payable",
-    "function writeChunk(bytes memory name, uint256 chunkId, bytes memory data) public payable",
-    "function files(bytes memory filename) public view returns (bytes memory)",
+    "function writeChunk(bytes memory name, uint256 chunkId, bytes calldata data) public payable",
     "function remove(bytes memory name) external returns (uint256)",
     "function countChunks(bytes memory name) external view returns (uint256)",
     "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)"
@@ -39,6 +37,23 @@ const bufferChunk = (buffer, chunkSize) => {
     result.push(buffer.slice(i, i += chunkLength));
   }
   return result;
+}
+
+const clearOldFile = async (fileContract, chunkSize, hexName) => {
+  try {
+    const oldChunkSize = await fileContract.countChunks(hexName);
+    if (oldChunkSize > chunkSize) {
+      // remove
+      const tx = await fileContract.remove(hexName);
+      console.log(`Remove file: ${fileName}`);
+      console.log(`Transaction Id: ${tx.hash}`);
+      const receipt = await tx.wait();
+      return receipt.status;
+    }
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
 
 const request = async ({
@@ -81,8 +96,14 @@ const request = async ({
     chunks.push(content);
   }
 
-  let uploadState = true;
   const fileContract = FileContract(contractAddress);
+  const clear = await clearOldFile(fileContract, chunks.length, hexName)
+  if (!clear) {
+    onError(new Error("Check Old File Fail!"));
+    return;
+  }
+
+  let uploadState = true;
   for (const index in chunks) {
     const chunk = chunks[index];
     let cost = 0;
@@ -116,7 +137,7 @@ const request = async ({
     }
   }
   if (uploadState) {
-    const url = "https://galileo.web3q.io/" + contractAddress + ":3334/" + name;
+    const url = "https://galileo.web3q.io/filebox.w3q/" + name;
     onSuccess({ path: url});
   } else {
     onError(new Error('upload request failed!'));

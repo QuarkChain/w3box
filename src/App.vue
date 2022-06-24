@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div>Upload Test</div>
-    <w3q-deployer drag multiple fileContract="0x0d597403b4ca32b8e6b359e9801b470766fd2514" style="width: 500px"/>
+    <w3q-deployer drag multiple fileContract="0x3A3151fFA9eAAe92C01D85720C131322c7deD4a7" style="width: 500px"/>
   </div>
 </template>
 
