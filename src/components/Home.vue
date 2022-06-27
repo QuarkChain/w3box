@@ -1,9 +1,9 @@
 <template>
   <div class="home">
     <p class="title">
-      The Upload File Web
+      Filebox is a file transfer plugin for web3q
     </p>
-    <w3q-deployer multiple fileContract="0x3A3151fFA9eAAe92C01D85720C131322c7deD4a7" style="width: 500px"/>
+    <w3q-deployer multiple fileContract="0xCD469d20bc4da5F97DC350FDB02D6370559C9511" style="width: 500px"/>
   </div>
 </template>
 

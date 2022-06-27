@@ -14,28 +14,44 @@
         </div>
         <el-button type="warning" round class="profile-btn" @click="goHome">Upload your first file</el-button>
       </div>
+
       <!--   data   -->
       <div v-else class="profile-date">
-        <upload-list @on-delete="onDelete" :files="this.result"/>
+        <div class="list-item" v-for="(file) in this.result" :key="file">
+          <img class="go-upload-list-item-img" :src="file" alt="">
+
+          <div class="go-upload-list-item-name">
+            <span>{{ getFileName(file) }}</span>
+          </div>
+
+          <div>
+             <span class="go-upload-list-item-delete" @click="onCopy(file)">
+              <update-icon name="copy"></update-icon>
+            </span>
+            <span v-if="false" class="go-upload-list-item-delete" @click="onDelete(file)">
+              <update-icon name="close"></update-icon>
+            </span>
+          </div>
+        </div>
       </div>
     </el-card>
   </div>
 </template>
 
 <script>
-import UploadList from "@/components/upload-list";
-
-import {getUploadByAddress} from '@/utils/profile';
+import UpdateIcon from "./icon";
+import {getUploadByAddress, deleteFile} from '@/utils/profile';
+const copy = require('clipboard-copy')
 
 export default {
   name: 'Profile',
-  components: { UploadList },
   data: () => {
     return {
       name: "",
       result: null,
     };
   },
+  components: { UpdateIcon },
   computed: {
     chainConfig() {
       return this.$store.state.chainConfig;
@@ -61,13 +77,41 @@ export default {
         return;
       }
       getUploadByAddress(FileBoxController, this.$route.params.address)
-      .then(value => {
-        this.result = value;
-      })
-      .catch((e) => {
-        console.log(e)
-        this.result = [];
+          .then(value => {
+            this.result = value;
+          })
+          .catch((e) => {
+            console.log(e)
+            this.result = [];
+          });
+    },
+    onCopy(url){
+      copy(url);
+      this.$notify({
+        title: 'Success',
+        message: 'Copy Success',
+        type: 'success'
       });
+    },
+    onDelete(url) {
+      const { FileBoxController} = this.$store.state.chainConfig;
+      if (!FileBoxController) {
+        return;
+      }
+      deleteFile(FileBoxController, this.getFileName(url))
+          .then(() => {
+            this.result.remove(url);
+          })
+          .catch((e) => {
+            console.log(e)
+          });
+    },
+    getFileName(url) {
+      if(url) {
+        const names = url.split("/");
+        return names[names.length - 1];
+      }
+      return "";
     }
   }
 }
@@ -75,6 +119,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+@import "../assets/styles/mixins.scss";
+@import "../assets/styles/vars.scss";
+
 .domain-loading {
   min-width: 40vw;
   min-height: 50vh;
@@ -133,6 +180,31 @@ export default {
   flex-wrap: wrap;
 }
 
+.list-item {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  padding: 15px;
+  border: 1px solid rgba(35,46,63,.4);
+}
+.go-upload-list-item-img {
+  width: 90px;
+  height: 90px;
+}
+.go-upload-list-item-name{
+  font-size: 19px;
+  font-weight: bold;
+}
+.go-upload-list-item-delete {
+  font-size: 20px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  padding: 15px;
+}
 
 @media screen and (max-width: 420px) {
   .profile-card {

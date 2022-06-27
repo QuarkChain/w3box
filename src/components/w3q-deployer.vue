@@ -12,7 +12,7 @@
     <div v-else class="go-upload-trigger" @click="onClickTrigger">
       <slot></slot>
     </div>
-    <upload-list v-if="showList" @on-delete="onDelete" @on-reUpload="onReUpload" :files="this.files"></upload-list>
+    <upload-list v-if="showList" @on-delete="onDelete" @on-reUpload="onReUpload" @on-copy="onCopy" :files="this.files"></upload-list>
   </div>
 </template>
 
@@ -20,6 +20,7 @@
 import request from '@/utils/request';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
+const copy = require('clipboard-copy')
 
 const sha3 = require('js-sha3').keccak_256;
 
@@ -189,6 +190,14 @@ export default {
       this.onProgress(event, file, this.files);
     },
 
+    onCopy(url) {
+      copy(url);
+      this.$notify({
+        title: 'Success',
+        message: 'Copy Success',
+        type: 'success'
+      });
+    },
     onDelete (file) {
       const i = this.files.indexOf(file);
       this.files.splice(i, 1);

@@ -138,7 +138,7 @@ const request = async ({
     }
   }
   if (uploadState) {
-    const url = "https://galileo.web3q.io/filebox.w3q/" + name;
+    const url = "https://galileo.web3q.io/file.w3q/" + name;
     onSuccess({ path: url});
   } else {
     onError(new Error('upload request failed!'));

@@ -33,7 +33,6 @@
 <script>
 import UpdateIcon from "./icon";
 import MyProgress from './progress';
-const copy = require('clipboard-copy')
 
 export default {
   name: 'UploadList',
@@ -58,7 +57,7 @@ export default {
       this.$emit('on-delete', file);
     },
     onCopy(url) {
-      copy(url);
+      this.$emit('on-copy', url);
     },
     onUpload(file) {
       this.$emit('on-reUpload', file);
