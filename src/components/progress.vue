@@ -1,6 +1,6 @@
 <template>
   <div class="group">
-    <div ref="inner" class="progress" v-for="index in chunks">
+    <div ref="inner" class="progress" v-for="index in chunks" :key="index">
       <div v-if="index - 1 < percent" class="progress-inner"></div>
     </div>
   </div>

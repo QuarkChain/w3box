@@ -40,7 +40,9 @@ export default {
   props: {
     files: {
       type: Array,
-      default: true
+      default() {
+        return []
+      }
     }
   },
   components: { UpdateIcon, MyProgress },

@@ -6,13 +6,14 @@ const FileContractInfo = {
     "function writeChunk(bytes memory name, uint256 chunkId, bytes calldata data) public payable",
     "function remove(bytes memory name) external returns (uint256)",
     "function countChunks(bytes memory name) external view returns (uint256)",
-    "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)"
+    "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)",
+    "function getAuthorFiles(address author) public view returns (string[] memory)"
   ],
 };
 
 const stringToHex = (s) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(s));
 
-const FileContract = (address) => {
+export const FileContract = (address) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const contract = new ethers.Contract(address, FileContractInfo.abi, provider);
   return contract.connect(provider.getSigner());
@@ -45,7 +46,7 @@ const clearOldFile = async (fileContract, chunkSize, hexName) => {
     if (oldChunkSize > chunkSize) {
       // remove
       const tx = await fileContract.remove(hexName);
-      console.log(`Remove file: ${fileName}`);
+      console.log(`Remove file: ${hexName}`);
       console.log(`Transaction Id: ${tx.hash}`);
       const receipt = await tx.wait();
       return receipt.status;

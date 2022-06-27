@@ -1,44 +1,83 @@
 <template>
-  <div id="app">
-    <div>Upload Test</div>
-    <w3q-deployer drag multiple fileContract="0x3A3151fFA9eAAe92C01D85720C131322c7deD4a7" style="width: 500px"/>
+  <div>
+    <w3q-tip v-if="!isMobile" style="width: 100vw" bgColor="#FF7528" fontColor="#ffffff" fontSize="15px"/>
+    <w3q-tip v-else style="width: 100vw" bgColor="#FF7528" fontColor="#ffffff" fontSize="12px"/>
+
+    <div id="app">
+      <el-container>
+        <el-header class="header">
+          <Header/>
+        </el-header>
+
+        <el-main :style="'min-height:'+ (fullHeight-195) +'px;'">
+          <router-view :key="$route.fullPath" />
+        </el-main>
+      </el-container>
+    </div>
   </div>
 </template>
 
 <script>
-import W3qDeployer from './components/w3q-deployer.vue';
+import Header from "@/components/Header";
+import Layout from "@/utils/Layout";
 
 export default {
-  name: 'app',
-  components: {W3qDeployer},
+  name: 'App',
+  components: {
+    Header
+  },
+  data() {
+    return {
+      fullHeight: document.documentElement.clientHeight
+    }
+  },
+  computed:{
+    isMobile() {
+      return Layout.isMobile();
+    },
+  },
+  watch: {
+    fullHeight(val) {
+      if (!this.timer) {
+        this.fullHeight = val;
+        this.timer = true;
+        let that = this;
+        setTimeout(function () {
+          that.timer = false;
+        }, 400)
+      }
+
+    }
+  },
+  mounted() {
+    this.get_bodyHeight()
+  },
+  methods: {
+    get_bodyHeight() {
+      const that = this
+      window.onresize = () => {
+        return (() => {
+          window.fullHeight = document.documentElement.clientHeight;
+          that.fullHeight = window.fullHeight;
+        })()
+      }
+    }
+  }
 }
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  max-width: 1200px;
+  text-align: center;
+  font-family: Avenir, Helvetica, Arial, AlibabaPuHuiTiM, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin: 0 auto;
 }
 
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
+.header {
+  height: 64px !important;
+  padding: 5px 20px !important;
 }
 </style>

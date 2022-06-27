@@ -18,7 +18,6 @@
 
 <script>
 import request from '@/utils/request';
-import MyProgress from './progress';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
 
@@ -28,7 +27,7 @@ const noop = () => {};
 
 export default {
   name: 'w3q-deployer',
-  components: { UploadDragger, UploadList, MyProgress },
+  components: { UploadDragger, UploadList },
   props: {
     fileContract: {
       type: String,
