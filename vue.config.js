@@ -8,6 +8,6 @@ module.exports = {
     }
   },
   productionSourceMap: false,
-  publicPath: '/filebox.w3q/',
+  publicPath: '/w3box.w3q/',
   runtimeCompiler: true,
 };

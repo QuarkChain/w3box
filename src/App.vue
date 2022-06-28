@@ -1,7 +1,7 @@
 <template>
   <div>
-    <w3q-tip v-if="!isMobile" style="width: 100vw" bgColor="rgba(35,46,63,.6)" fontColor="#ffffff" fontSize="15px"/>
-    <w3q-tip v-else style="width: 100vw" bgColor="rgba(35,46,63,.6)" fontColor="#ffffff" fontSize="12px"/>
+    <w3q-tip v-if="!isMobile" style="width: 100vw" bgColor="#FF7528" fontColor="#ffffff" fontSize="15px"/>
+    <w3q-tip v-else style="width: 100vw" bgColor="#FF7528" fontColor="#ffffff" fontSize="12px"/>
 
     <div id="app">
       <el-container>
@@ -12,6 +12,18 @@
         <el-main :style="'min-height:'+ (fullHeight-195) +'px;'">
           <router-view :key="$route.fullPath" />
         </el-main>
+
+        <el-footer class="footer">
+          <div class="footer-layout">
+            <el-row>
+              <img class="footer-img" src="./assets/tweet.png"/>
+              <img class="footer-img" src="./assets/mid.png"/>
+              <img class="footer-img" src="./assets/git.png"/>
+              <img class="footer-img" src="./assets/tel.png"/>
+              <img class="footer-img" src="./assets/dis.png"/>
+            </el-row>
+          </div>
+        </el-footer>
       </el-container>
     </div>
   </div>
@@ -79,5 +91,29 @@ export default {
 .header {
   height: 64px !important;
   padding: 5px 20px !important;
+}
+
+.footer {
+  padding: 30px !important;
+  height: 95px !important;
+  background: transparent;
+}
+
+.footer-layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-img {
+  width: 36px;
+  margin: 0 10px;
+}
+
+@media screen and (max-width: 420px) {
+  .footer-img {
+    width: 28px;
+  }
 }
 </style>

@@ -46,8 +46,8 @@ $family-sans-serif: KGBrokenVesselsSketch;
 }
 
 .logo {
-  min-height: 38px;
-  max-height: 38px;
+  min-height: 36px;
+  max-height: 36px;
 }
 
 @media screen and (max-width: 420px) {

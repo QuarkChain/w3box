@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <p class="title">
-      Filebox is a file transfer plugin for web3q
+      The File Hosting Service on Web3Q
     </p>
     <w3q-deployer multiple :fileContract="contract" style="width: 500px"/>
   </div>

@@ -23,7 +23,7 @@
       <span v-if="file.status === 'failure'" class="go-upload-list-item-delete" @click="onUpload(file)">
           <update-icon name="upload"></update-icon>
       </span>
-      <span v-if="file.status !== 'pending'" class="go-upload-list-item-delete" @click="onDelete(file)">
+      <span v-if="file.status!=='pending'&&file.status!=='success'" class="go-upload-list-item-delete" @click="onDelete(file)">
           <update-icon name="close"></update-icon>
       </span>
     </div>
@@ -84,13 +84,14 @@ export default {
   }
   .go-upload-list-item.success {
     .go-upload-list-item-name {
-      color: $primary;
+      color: $success;
     }
   }
   .go-upload-list-item-name {
     margin-left: 8px;
     margin-right: 8px;
     flex: 1;
+    font-weight: bold;
     @include ellipsis;
   }
   .go-upload-list-item-delete {

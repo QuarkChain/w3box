@@ -19,7 +19,7 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  base: '/filebox.w3q/',
+  base: '/w3box.w3q/',
   routes,
 });
 
