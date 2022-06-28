@@ -13,24 +13,13 @@ import W3qDeployer from '@/components/w3q-deployer.vue';
 export default {
   name: 'Home',
   components: {W3qDeployer},
-  data: () => {
-    return {
-      contract: null,
-    };
-  },
   computed: {
-    chainConfig() {
-      return this.$store.state.chainConfig;
-    }
-  },
-  watch: {
-    chainConfig: function () {
+    contract() {
       if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
         const {FileBoxController} = this.$store.state.chainConfig;
-        this.contract = FileBoxController;
-      } else {
-        this.contract = null;
+        return FileBoxController;
       }
+      return null;
     }
   }
 }
