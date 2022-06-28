@@ -28,10 +28,13 @@
           <span>{{ renderTimestamp(item.time)}}</span>
 
           <div>
-             <span class="go-upload-list-item-delete" @click="onCopy(item.url)">
+            <span class="go-upload-list-item-delete" @click="onCopy(item.url)">
               <update-icon name="copy"></update-icon>
             </span>
-            <span class="go-upload-list-item-delete" @click="onDelete(item)">
+            <span v-if="item.showProgress" class="go-upload-list-item-delete">
+              <update-icon class="icon-loading" name="loading"></update-icon>
+            </span>
+            <span v-else class="go-upload-list-item-delete" @click="onDelete(item)">
               <update-icon name="close"></update-icon>
             </span>
           </div>
@@ -116,6 +119,7 @@ export default {
       if (!FileBoxController) {
         return;
       }
+      item.showProgress = true;
       deleteFile(FileBoxController, item.name)
           .then((v) => {
             if (v) {
@@ -126,6 +130,7 @@ export default {
                 type: 'success'
               });
             } else {
+              item.showProgress = false;
               this.$notify({
                 title: 'Error',
                 message: 'Delete Fail',
@@ -134,6 +139,7 @@ export default {
             }
           })
           .catch(() => {
+            item.showProgress = false;
             this.$notify({
               title: 'Error',
               message: 'Delete Fail',
@@ -226,6 +232,8 @@ export default {
   font-size: 19px;
   font-weight: bold;
   margin-left: 25px;
+  width: 190px;
+  text-align: left;
 }
 .go-upload-list-item-delete {
   font-size: 20px;
@@ -233,6 +241,17 @@ export default {
   height: 30px;
   cursor: pointer;
   padding: 15px;
+}
+.icon-loading {
+  animation: rotating 2s infinite linear;
+}
+@keyframes rotating {
+  0% {
+    transform: rotate(0deg)
+  }
+  to {
+    transform: rotate(1turn)
+  }
 }
 
 @media screen and (max-width: 420px) {

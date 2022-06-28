@@ -3,7 +3,7 @@
     <p class="title">
       Filebox is a file transfer plugin for web3q
     </p>
-    <w3q-deployer multiple fileContract="0x5FCEc4e8CdEF260F00971d2fC3b2dA16fD20e7e0" style="width: 500px"/>
+    <w3q-deployer multiple :fileContract="contract" style="width: 500px"/>
   </div>
 </template>
 
@@ -13,6 +13,26 @@ import W3qDeployer from '@/components/w3q-deployer.vue';
 export default {
   name: 'Home',
   components: {W3qDeployer},
+  data: () => {
+    return {
+      contract: null,
+    };
+  },
+  computed: {
+    chainConfig() {
+      return this.$store.state.chainConfig;
+    }
+  },
+  watch: {
+    chainConfig: function () {
+      if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
+        const {FileBoxController} = this.$store.state.chainConfig;
+        this.contract = FileBoxController;
+      } else {
+        this.contract = null;
+      }
+    }
+  }
 }
 </script>
 

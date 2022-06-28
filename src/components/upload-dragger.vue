@@ -1,5 +1,5 @@
 <template>
-  <div
+  <div v-if="enable"
     class="go-upload-dragger"
     :class="{dragging}"
     @dragenter="onDragenter"
@@ -13,6 +13,12 @@
       <span>Drop file here or click to upload</span>
     </div>
   </div>
+  <div v-else class="go-upload-dragger-enable">
+    <update-icon class="go-upload-dragger-icon" name="upload" />
+    <div class="go-upload-dragger-describe">
+      <span>Drop file here or click to upload</span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -20,6 +26,12 @@ import UpdateIcon from "./icon";
 
 export default {
   name: 'UploadDragger',
+  props: {
+    enable: {
+      type: Boolean,
+      default: true
+    }
+  },
   data () {
     return {
       dragging: false
@@ -79,6 +91,21 @@ export default {
   .go-upload-dragger-icon {
     font-size: 60px;
     color: $gray600;
+  }
+}
+.go-upload-dragger-enable {
+  border: 1px dashed #cccccc;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  .go-upload-dragger-icon {
+    font-size: 60px;
+    color: #cccccc;
+  }
+  .go-upload-dragger-describe {
+    color: #cccccc;
   }
 }
 </style>

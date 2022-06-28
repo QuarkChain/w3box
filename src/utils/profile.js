@@ -12,7 +12,8 @@ export const getUploadByAddress = async (controller, address) => {
         const file = {
             time: new Date(parseInt(times[i], 10) * 1000),
             name: names[i],
-            url: urls[i]
+            url: urls[i],
+            showProgress: false
         };
         files.push(file);
     }

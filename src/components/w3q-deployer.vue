@@ -8,11 +8,11 @@
         type="file"
         @change="onInputChange"
     />
-    <upload-dragger v-if="drag" @on-click="onClickTrigger" @handle-files="uploadFiles"></upload-dragger>
+    <upload-dragger v-if="drag" :enable="enable" @on-click="onClickTrigger" @handle-files="uploadFiles" />
     <div v-else class="go-upload-trigger" @click="onClickTrigger">
       <slot></slot>
     </div>
-    <upload-list v-if="showList" @on-delete="onDelete" @on-reUpload="onReUpload" @on-copy="onCopy" :files="this.files"></upload-list>
+    <upload-list v-if="enable && showList" @on-delete="onDelete" @on-reUpload="onReUpload" @on-copy="onCopy" :files="this.files" />
   </div>
 </template>
 
@@ -32,7 +32,7 @@ export default {
   props: {
     fileContract: {
       type: String,
-      required: true
+      default: ""
     },
     dirPath: {
       type: String,
@@ -66,10 +66,17 @@ export default {
       currentReq: null
     };
   },
+  computed: {
+    enable() {
+      return this.fileContract !== null;
+    }
+  },
   methods: {
     // event
     onClickTrigger () {
-      this.$refs.input.click();
+      if (this.enable) {
+        this.$refs.input.click();
+      }
     },
     onInputChange (e) {
       // e.target.files is pseudo array, need to convert to real array
