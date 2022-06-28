@@ -10,25 +10,28 @@
       <!--   empty   -->
       <div v-if="!this.result || this.result.length<=0" class="profile-empty">
         <div class="profile-text">
-          You don't own any domains yet
+          You don't own any file yet
         </div>
         <el-button type="warning" round class="profile-btn" @click="goHome">Upload your first file</el-button>
       </div>
 
       <!--   data   -->
       <div v-else class="profile-date">
-        <div class="list-item" v-for="(file) in this.result" :key="file">
-          <img class="go-upload-list-item-img" :src="file" alt="">
-
-          <div class="go-upload-list-item-name">
-            <span>{{ getFileName(file) }}</span>
+        <div class="list-item" v-for="(item) in this.result" :key="item.url">
+          <div style="display:flex; flex-direction: row; align-items: center">
+            <img class="go-upload-list-item-img" :src="item.url" alt="">
+            <div class="go-upload-list-item-name">
+              <span>{{ renderName(item.name) }}</span>
+            </div>
           </div>
 
+          <span>{{ renderTimestamp(item.time)}}</span>
+
           <div>
-             <span class="go-upload-list-item-delete" @click="onCopy(file)">
+             <span class="go-upload-list-item-delete" @click="onCopy(item.url)">
               <update-icon name="copy"></update-icon>
             </span>
-            <span v-if="false" class="go-upload-list-item-delete" @click="onDelete(file)">
+            <span class="go-upload-list-item-delete" @click="onDelete(item)">
               <update-icon name="close"></update-icon>
             </span>
           </div>
@@ -39,9 +42,12 @@
 </template>
 
 <script>
+import {ethers} from "ethers";
 import UpdateIcon from "./icon";
 import {getUploadByAddress, deleteFile} from '@/utils/profile';
+
 const copy = require('clipboard-copy')
+const hexToString = (h) => ethers.utils.toUtf8String(h);
 
 export default {
   name: 'Profile',
@@ -68,6 +74,19 @@ export default {
     this.onSearch();
   },
   methods: {
+    renderTimestamp(ts) {
+      if (!ts) {
+        return "";
+      }
+      return ts.toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    },
+    renderName(name) {
+      return hexToString(name);
+    },
     goHome() {
       this.$router.push({path: "/"});
     },
@@ -80,8 +99,7 @@ export default {
           .then(value => {
             this.result = value;
           })
-          .catch((e) => {
-            console.log(e)
+          .catch(() => {
             this.result = [];
           });
     },
@@ -93,25 +111,35 @@ export default {
         type: 'success'
       });
     },
-    onDelete(url) {
+    onDelete(item) {
       const { FileBoxController} = this.$store.state.chainConfig;
       if (!FileBoxController) {
         return;
       }
-      deleteFile(FileBoxController, this.getFileName(url))
-          .then(() => {
-            this.result.remove(url);
+      deleteFile(FileBoxController, item.name)
+          .then((v) => {
+            if (v) {
+              this.result = this.result.filter(value => item !== value);
+              this.$notify({
+                title: 'Success',
+                message: 'Delete Success',
+                type: 'success'
+              });
+            } else {
+              this.$notify({
+                title: 'Error',
+                message: 'Delete Fail',
+                type: 'error'
+              });
+            }
           })
-          .catch((e) => {
-            console.log(e)
+          .catch(() => {
+            this.$notify({
+              title: 'Error',
+              message: 'Delete Fail',
+              type: 'error'
+            });
           });
-    },
-    getFileName(url) {
-      if(url) {
-        const names = url.split("/");
-        return names[names.length - 1];
-      }
-      return "";
     }
   }
 }
@@ -197,6 +225,7 @@ export default {
 .go-upload-list-item-name{
   font-size: 19px;
   font-weight: bold;
+  margin-left: 25px;
 }
 .go-upload-list-item-delete {
   font-size: 20px;

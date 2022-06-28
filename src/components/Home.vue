@@ -3,7 +3,7 @@
     <p class="title">
       Filebox is a file transfer plugin for web3q
     </p>
-    <w3q-deployer multiple fileContract="0xCD469d20bc4da5F97DC350FDB02D6370559C9511" style="width: 500px"/>
+    <w3q-deployer multiple fileContract="0x5FCEc4e8CdEF260F00971d2fC3b2dA16fD20e7e0" style="width: 500px"/>
   </div>
 </template>
 

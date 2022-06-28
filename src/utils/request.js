@@ -7,7 +7,7 @@ const FileContractInfo = {
     "function remove(bytes memory name) external returns (uint256)",
     "function countChunks(bytes memory name) external view returns (uint256)",
     "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)",
-    "function getAuthorFiles(address author) public view returns (string[] memory)"
+    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,string[] memory urls)"
   ],
 };
 
