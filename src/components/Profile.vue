@@ -19,7 +19,10 @@
       <div v-else class="profile-date">
         <div class="list-item" v-for="(item) in this.result" :key="item.url">
           <div style="display:flex; flex-direction: row; align-items: center">
-            <img class="go-upload-list-item-img" :src="item.url" alt="">
+            <template>
+              <img v-if="isImage(renderName(item.type))" class="go-upload-list-item-img" :src="item.url" alt="">
+              <update-icon v-else class="go-upload-list-item-img" name="file"/>
+            </template>
             <div class="go-upload-list-item-name">
               <span>{{ renderName(item.name) }}</span>
             </div>
@@ -146,7 +149,11 @@ export default {
               type: 'error'
             });
           });
-    }
+    },
+    isImage(type) {
+      if (!type) {return;}
+      return type.includes('image');
+    },
   }
 }
 </script>
@@ -225,10 +232,10 @@ export default {
   border: 1px solid rgba(35,46,63,.4);
 }
 .go-upload-list-item-img {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
 }
-.go-upload-list-item-name{
+.go-upload-list-item-name {
   font-size: 19px;
   font-weight: bold;
   margin-left: 25px;

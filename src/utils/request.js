@@ -3,11 +3,11 @@ const sha3 = require('js-sha3').keccak_256;
 
 const FileContractInfo = {
   abi: [
-    "function writeChunk(bytes memory name, uint256 chunkId, bytes calldata data) public payable",
+    "function writeChunk(bytes memory name, bytes memory fileType, uint256 chunkId, bytes calldata data) public payable",
     "function remove(bytes memory name) external returns (uint256)",
     "function countChunks(bytes memory name) external view returns (uint256)",
     "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)",
-    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,string[] memory urls)"
+    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types,string[] memory urls)"
   ],
 };
 
@@ -69,9 +69,10 @@ const request = async ({
     onError(new Error("Can't find metamask"));
     return;
   }
+  let account;
   try {
-    const address = await window.ethereum.enable();
-    if (!address) {
+    account = await window.ethereum.enable();
+    if (!account) {
       onError(new Error("Can't get Account"));
       return;
     }
@@ -86,6 +87,7 @@ const request = async ({
   // file name
   const name = dirPath + rawFile.name;
   const hexName = stringToHex(name);
+  const hexType = stringToHex(rawFile.type);
   // Data need to be sliced if file > 475K
   let fileSize = rawFile.size;
   let chunks = [];
@@ -98,7 +100,7 @@ const request = async ({
   }
 
   const fileContract = FileContract(contractAddress);
-  const clear = await clearOldFile(fileContract, chunks.length, hexName)
+  const clear = await clearOldFile(fileContract, chunks.length, hexName, hexType)
   if (!clear) {
     onError(new Error("Check Old File Fail!"));
     return;
@@ -122,7 +124,7 @@ const request = async ({
 
     try {
       // file is remove or change
-      const tx = await fileContract.writeChunk(hexName, index, hexData, {
+      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData, {
         value: ethers.utils.parseEther(cost.toString())
       });
       console.log(`Transaction Id: ${tx.hash}`);
@@ -138,7 +140,7 @@ const request = async ({
     }
   }
   if (uploadState) {
-    const url = "https://galileo.web3q.io/file.w3q/" + name;
+    const url = "https://galileo.web3q.io/file.w3q/" + account + "/" + name;
     onSuccess({ path: url});
   } else {
     onError(new Error('upload request failed!'));
