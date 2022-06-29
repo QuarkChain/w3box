@@ -44,7 +44,7 @@ export default {
   width: 100%;
 }
 .progress {
-  background-color: #eaeef4;
+  background-color: #cccccc;
   border-radius: 100px;
   height: 6px;
   transition: width 0.2s linear;
