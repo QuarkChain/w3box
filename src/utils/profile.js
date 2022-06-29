@@ -19,6 +19,9 @@ export const getUploadByAddress = async (controller, address) => {
         };
         files.push(file);
     }
+    files.sort(function (a, b) {
+        return a.time - b.time
+    });
     return files;
 }
 

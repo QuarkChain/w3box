@@ -10,7 +10,7 @@
       <!--   empty   -->
       <div v-if="!this.result || this.result.length<=0" class="profile-empty">
         <div class="profile-text">
-          You don't own any file yet
+          You haven't uploaded any file yet
         </div>
         <el-button type="warning" round class="profile-btn" @click="goHome">Upload your first file</el-button>
       </div>
@@ -24,7 +24,9 @@
               <update-icon v-else class="go-upload-list-item-img" name="file"/>
             </template>
             <div class="go-upload-list-item-name">
-              <span>{{ renderName(item.name) }}</span>
+              <a :href="item.url" target="_blank">
+                {{ renderName(item.name) }}
+              </a>
             </div>
           </div>
 
@@ -205,14 +207,14 @@ export default {
 }
 
 .profile-btn {
-  background-color: #FF7528;
+  background-color: #52DEFF;
   margin-top: 15px;
   font-size: 18px;
   border: 0;
 }
 .profile-btn:focus,
 .profile-btn:hover {
-  background-color: #FF7528BB;
+  background-color: #52DEFFBB;
 }
 
 .profile-date {

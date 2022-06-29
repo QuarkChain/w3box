@@ -211,11 +211,11 @@ export default {
   color: #ffffff;
   font-size: 18px;
   border: 0;
-  background: #FF7528;
+  background: #52DEFF;
   border-radius: 36px;
 }
 .btn-connect:hover {
-  background-color: #FF752890;
+  background-color: #52DEFF90;
   border: 0;
 }
 </style>

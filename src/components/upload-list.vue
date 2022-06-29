@@ -13,7 +13,10 @@
       </div>
 
       <div class="go-upload-list-item-name">
-        <span>{{ file.name }}</span>
+        <a v-if="file.status==='success'" :href="file.url" target="_blank">
+          <span>{{ file.name }}</span>
+        </a>
+        <span v-else>{{ file.name }}</span>
         <my-progress v-if="file.status === 'pending'" :percent="file.percent" :chunks="file.totalChunks"></my-progress>
       </div>
 
@@ -84,7 +87,12 @@ export default {
   }
   .go-upload-list-item.success {
     .go-upload-list-item-name {
-      color: $success;
+      a {
+        color: $success;
+      }
+      a:hover {
+        color: #2dce8990;
+      }
     }
   }
   .go-upload-list-item-name {
