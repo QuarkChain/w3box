@@ -2,8 +2,17 @@
   <div>
     <div v-if="!this.result" class="domain-loading" v-loading="true"/>
     <el-card v-else class="profile-card">
-      <div class="profile-title">
-        Files
+      <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+        <div class="profile-title">
+          Files
+        </div>
+        <el-button v-if="this.result&&this.result.length>0&&!isDelete" round class="profile-delete" @click="openDelete">
+          Delete multiple
+        </el-button>
+        <div v-if="isDelete">
+          <el-button round class="profile-delete" @click="onCancelDelete">Cancel</el-button>
+          <el-button round class="profile-delete-btn" @click="onDeleteMult">Delete</el-button>
+        </div>
       </div>
       <div class="divider"/>
 
@@ -19,6 +28,7 @@
       <div v-else class="profile-date">
         <div class="list-item" v-for="(item) in this.result" :key="item.url">
           <div style="display:flex; flex-direction: row; align-items: center">
+            <input v-if="isDelete" style="padding: 15px; margin-right: 15px" :id="item.url" :value="item" type="checkbox" v-model="checkedDeletes"/>
             <template>
               <img v-if="isImage(renderName(item.type))" class="go-upload-list-item-img" :src="item.url" alt="">
               <update-icon v-else class="go-upload-list-item-img" name="file"/>
@@ -30,7 +40,7 @@
             </div>
           </div>
 
-          <span>{{ renderTimestamp(item.time)}}</span>
+          <span>{{ renderTimestamp(item.time) }}</span>
 
           <div>
             <span class="go-upload-list-item-delete" @click="onCopy(item.url)">
@@ -39,7 +49,7 @@
             <span v-if="item.showProgress" class="go-upload-list-item-delete">
               <update-icon class="icon-loading" name="loading"></update-icon>
             </span>
-            <span v-else class="go-upload-list-item-delete" @click="onDelete(item)">
+            <span v-else-if="!isDelete" class="go-upload-list-item-delete" @click="onDelete(item)">
               <update-icon name="close"></update-icon>
             </span>
           </div>
@@ -52,7 +62,7 @@
 <script>
 import {ethers} from "ethers";
 import UpdateIcon from "./icon";
-import {getUploadByAddress, deleteFile} from '@/utils/profile';
+import {getUploadByAddress, deleteFile, deleteFiles} from '@/utils/profile';
 
 const copy = require('clipboard-copy')
 const hexToString = (h) => ethers.utils.toUtf8String(h);
@@ -63,6 +73,8 @@ export default {
     return {
       name: "",
       result: null,
+      isDelete: false,
+      checkedDeletes: []
     };
   },
   components: { UpdateIcon },
@@ -152,6 +164,59 @@ export default {
             });
           });
     },
+    openDelete() {
+      this.isDelete = true;
+    },
+    onCancelDelete() {
+      this.isDelete = false;
+      this.checkedDeletes = [];
+    },
+    onDeleteMult() {
+      const { FileBoxController} = this.$store.state.chainConfig;
+      if (!FileBoxController) {
+        return;
+      }
+      if (this.checkedDeletes.length > 0) {
+        const names = [];
+        for(const item of this.checkedDeletes) {
+          item.showProgress = true;
+          names.push(item.name);
+        }
+        deleteFiles(FileBoxController, names)
+            .then((v) => {
+              if (v) {
+                for(const item of this.checkedDeletes) {
+                  this.result = this.result.filter(value => item !== value);
+                }
+                this.onCancelDelete();
+                this.$notify({
+                  title: 'Success',
+                  message: 'Delete Success',
+                  type: 'success'
+                });
+              } else {
+                for(const item of this.checkedDeletes) {
+                  item.showProgress = false;
+                }
+                this.$notify({
+                  title: 'Error',
+                  message: 'Delete Fail',
+                  type: 'error'
+                });
+              }
+            })
+            .catch(() => {
+              for(const item of this.checkedDeletes) {
+                item.showProgress = false;
+              }
+              this.$notify({
+                title: 'Error',
+                message: 'Delete Fail',
+                type: 'error'
+              });
+            });
+      }
+    },
     isImage(type) {
       if (!type) {return;}
       return type.includes('image');
@@ -215,6 +280,26 @@ export default {
 .profile-btn:focus,
 .profile-btn:hover {
   background-color: #52DEFFBB;
+}
+
+.profile-delete {
+  color: #52DEFF;
+  font-size: 16px;
+}
+.profile-delete:focus,
+.profile-delete:hover {
+  color: #52DEFF;
+}
+.profile-delete-btn {
+  background-color: #52DEFF;
+  font-size: 16px;
+  border: 0;
+  color: #ffffff;
+}
+.profile-delete-btn:focus,
+.profile-delete-btn:hover {
+  background-color: #52DEFFBB;
+  color: #ffffff;
 }
 
 .profile-date {

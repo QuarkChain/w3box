@@ -31,3 +31,10 @@ export const deleteFile = async (controller, file) => {
     const receipt = await tx.wait();
     return receipt.status;
 }
+
+export const deleteFiles = async (controller, files) => {
+    const fileContract = FileContract(controller);
+    const tx = await fileContract.removes(files);
+    const receipt = await tx.wait();
+    return receipt.status;
+}
