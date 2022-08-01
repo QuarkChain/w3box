@@ -61,7 +61,7 @@
 
 <script>
 import {ethers} from "ethers";
-import UpdateIcon from "./icon";
+import UpdateIcon from "../components/icon";
 import {getUploadByAddress, deleteFile, deleteFiles} from '@/utils/profile';
 
 const copy = require('clipboard-copy')

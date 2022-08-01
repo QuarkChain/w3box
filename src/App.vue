@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import Header from "@/components/Header";
+import Header from "@/page/Header";
 import Layout from "@/utils/Layout";
 
 export default {
