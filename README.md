@@ -94,5 +94,5 @@ function getUrl(bytes memory name) public view returns (string memory) {
     ));
 }
 ```
-ex:
+e.g.,
     https://galileo.web3q.io/file.w3q/0xb5a0ba79d7f63571b7ba81c9ab30e8f9a72b858f/coin.png
