@@ -84,7 +84,7 @@ function getAuthorFiles(address author)
 ```
 
 #### Read file content
-The Web3Q gateway can read the files in the contract according to the parameters in the URL, and supports that the contract in the URL is in the form of a domain name, so the files uploaded by the user can be accessed through the URL. The server URL details are [here](https://docs.web3q.io/advanced-topics/web3q-gateway).
+The Web3Q gateway can read the files in the contract according to the parameters in the URL, and the server URL details are [here](https://docs.web3q.io/advanced-topics/web3q-gateway).
 ```
 function getUrl(bytes memory name) public view returns (string memory) {
     return string(abi.encodePacked(
