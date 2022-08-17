@@ -20,7 +20,7 @@ The contract mapped by w3box.w3q is a FlatDirectory contract that stores w3box's
 [file.w3q](https://galileo.web3q.io/w3ns.w3q/#/domains/file.w3q) is also a w3ns domain name, and its mapped FlatDirectory contract is used to store files uploaded by users.
 
 #### SimpleW3box
-SimpleW3box is used to manage the file information uploaded by users. It contains the file.w3q contract, and all files will be uploaded to the file.w3q contract.
+SimpleW3box is used to manage the file information uploaded by users. It contains the file.w3q contract and all files will be uploaded to the file.w3q contract.
 ```
 contract SimpleW3box {
     FlatDirectory public fileFD; // file.w3q contract
@@ -48,7 +48,7 @@ function getNewName(address author,bytes memory name) public pure returns (bytes
 }
 ```
 
-Get the user's file upload time, file name, file type, and file url.
+Get the user's file upload time, file name, file type, and file URL.
 ```
 function getAuthorFiles(address author)
     public view
@@ -74,7 +74,7 @@ function getAuthorFiles(address author)
 }
 ```
 
-The web3q server can read the files in the contract according to the parameters in the url, and supports that the contract in the url is in the form of a domain name, so the files uploaded by the user can be accessed through the url. The server url details are [here](https://docs.web3q.io/advanced-topics/web3q-gateway).
+The web3q server can read the files in the contract according to the parameters in the URL, and supports that the contract in the URL is in the form of a domain name, so the files uploaded by the user can be accessed through the URL. The server URL details are [here](https://docs.web3q.io/advanced-topics/web3q-gateway).
 ```
 function getUrl(bytes memory name) public view returns (string memory) {
     return string(abi.encodePacked(
