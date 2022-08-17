@@ -1,4 +1,4 @@
-# w3box
+# W3Box
 
 ## Introduction
 Based on the Web3Q chain, this project implements a decentralized website where anyone can upload public files without permission. If the uploaded file is more than 24kb, the uploader needs to stake w3q tokens according to the file size. Only the uploader can delete uploaded files.
@@ -94,5 +94,5 @@ function getUrl(bytes memory name) public view returns (string memory) {
     ));
 }
 ```
-e.g.,
+E.g.,
     https://galileo.web3q.io/file.w3q/0xb5a0ba79d7f63571b7ba81c9ab30e8f9a72b858f/coin.png
