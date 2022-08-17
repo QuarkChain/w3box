@@ -49,7 +49,7 @@ function writeChunk(bytes memory fileName, bytes memory fileType, uint256 chunkI
 ```
 
 #### File Name
-In file.w3q, the file is saved and read by name. Adding the user address before the file name can avoid the probability of duplicate names, and file name format is address/file name
+In file.w3q, the file is saved and read by name. Adding the user address before the file name can avoid the probability of duplicate names, and file name format is address/file name.
 ```
 function getNewName(address author,bytes memory name) public pure returns (bytes memory) {
     return abi.encodePacked(Strings.toHexString(uint256(uint160(author)), 20),'/',name);
@@ -57,7 +57,7 @@ function getNewName(address author,bytes memory name) public pure returns (bytes
 ```
 
 #### Read file information
-Read the basic information of the file by the user. Get the file upload time, file name, file type, and file URL.
+The basic information of the file can be read by the user address, and the information includes upload time, name, type, and URL.
 ```
 function getAuthorFiles(address author)
     public view
@@ -84,7 +84,7 @@ function getAuthorFiles(address author)
 ```
 
 #### Read file content
-The web3q server can read the files in the contract according to the parameters in the URL, and supports that the contract in the URL is in the form of a domain name, so the files uploaded by the user can be accessed through the URL. The server URL details are [here](https://docs.web3q.io/advanced-topics/web3q-gateway).
+The Web3Q gateway can read the files in the contract according to the parameters in the URL, and supports that the contract in the URL is in the form of a domain name, so the files uploaded by the user can be accessed through the URL. The server URL details are [here](https://docs.web3q.io/advanced-topics/web3q-gateway).
 ```
 function getUrl(bytes memory name) public view returns (string memory) {
     return string(abi.encodePacked(
