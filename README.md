@@ -8,7 +8,7 @@ The official home page of the W3Box project is [https://galileo.web3q.io/w3box.w
 
 
 ## Structure
-The front-end code of this project and all the data are stored on the blockchain to achieve decentralization of the website. The project is implemented by three contracts, w3box.w3q, file.w3q and SimpleW3box.
+The front-end code of this project and all the data are stored on the blockchain to achieve full decentralization of the website. The project is implemented by three contracts, w3box.w3q, file.w3q and SimpleW3box.
 <br/>
 
 ### w3box.w3q
