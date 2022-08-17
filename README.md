@@ -8,7 +8,7 @@ The official home page of the W3Box project is [https://galileo.web3q.io/w3box.w
 
 
 ## Structure
-The front-end code of this project and all the data are stored on the blockchain to achieve full decentralization of the website. The project is implemented by three contracts, w3box.w3q, file.w3q and SimpleW3box.
+The front-end code of this project and all the data are stored on the blockchain to achieve full decentralization of the website. The project is implemented by three contracts which are w3box.w3q, file.w3q and SimpleW3box.
 <br/>
 
 ### w3box.w3q
@@ -24,7 +24,7 @@ FlatDirectory is the implementation of the web3 storage data contract. Click [he
 ### SimpleW3box
 SimpleW3box is used to manage the file information uploaded by users. 
 
-##### Storage structure
+#### Storage structure
 ```
 contract SimpleW3box {
     FlatDirectory public fileFD; // file.w3q contract
@@ -32,7 +32,7 @@ contract SimpleW3box {
 }
 ```
 
-##### Upload files
+#### Upload files
 ```
 function writeChunk(bytes memory fileName, bytes memory fileType, uint256 chunkId, bytes calldata data) public payable {
     bytes32 nameHash = keccak256(fileName);
@@ -48,15 +48,15 @@ function writeChunk(bytes memory fileName, bytes memory fileType, uint256 chunkI
 }
 ```
 
-##### File Name
-In file.w3q, the file is saved and read by name. Adding the user address before the file name can avoid the probability of duplicate names, file name format (address/file name)
+#### File Name
+In file.w3q, the file is saved and read by name. Adding the user address before the file name can avoid the probability of duplicate names, and file name format is address/file name
 ```
 function getNewName(address author,bytes memory name) public pure returns (bytes memory) {
     return abi.encodePacked(Strings.toHexString(uint256(uint160(author)), 20),'/',name);
 }
 ```
 
-##### Read file information
+#### Read file information
 Read the basic information of the file by the user. Get the file upload time, file name, file type, and file URL.
 ```
 function getAuthorFiles(address author)
