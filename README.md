@@ -1,7 +1,7 @@
 # w3box
 
 ## Introduce
-##### This project implements an open source website where anyone can upload public files without permission
+This project implements an open source website where anyone can upload public files without permission
 <br>
 
 ## Implementation
