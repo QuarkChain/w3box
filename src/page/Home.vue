@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <img class="home-logo" src="../assets/home.png"/>
     <p class="title">
       The File Hosting Service on Web3Q
     </p>
@@ -32,12 +33,16 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+.home-logo {
+  margin-top: 35px;
+  width: 230px;
+}
 
 .title {
-  font-size: 50px;
-  color: #221F33;
+  font-size: 30px;
+  color: #333333;
+  margin-bottom: 55px;
+  margin-top: 30px;
   line-height: 50px;
-  margin-bottom: 60px;
-  margin-top: 120px;
 }
 </style>
