@@ -1,14 +1,14 @@
 # W3Box
 
 ## Introduction
-Based on the Web3Q chain, this project implements a decentralized website where anyone can upload public files without permission. If the uploaded file is more than 24kb, the uploader needs to stake w3q tokens according to the file size. Only the uploader can delete uploaded files.
+W3Box is a public file hosting service based on the Web3Q chain. Anyone can upload public files without permission, and only the uploader can delete uploaded files.
 
-The official home page of the W3Box project is [https://web3q.io/w3box.w3q/](https://web3q.io/w3box.w3q/#/).
+W3Box can be visited here: [https://web3q.io/w3box.w3q/](https://web3q.io/w3box.w3q/#/).
 <br/>
 
 
-## Structure
-The front-end code of this project and all the data are stored on the blockchain to achieve full decentralization of the website. The project is implemented by three contracts which are w3box.w3q, file.w3q and SimpleW3box.
+## How does it work
+W3Box is a fully decentralized dApp which means the front-end code, back-end (smart contract) code, and users' files are all stored on the chain. The front-end contract is w3box.w3q, the backend contract is SimpleW3box and Users' files are store in file.w3q.
 <br/>
 
 ### w3box.w3q
@@ -49,7 +49,7 @@ function writeChunk(bytes memory fileName, bytes memory fileType, uint256 chunkI
 ```
 
 #### File Name
-In file.w3q, the file is saved and read by name. Adding the user address before the file name can avoid the probability of duplicate names, and file name format is address/file name.
+In file.w3q, the file is read and written by name. Adding the user address before the file name can avoid duplicate names, and the file name format is address/fileName.
 ```
 function getNewName(address author,bytes memory name) public pure returns (bytes memory) {
     return abi.encodePacked(Strings.toHexString(uint256(uint160(author)), 20),'/',name);
