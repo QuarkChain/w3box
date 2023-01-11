@@ -2,7 +2,7 @@
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
     <p class="title">
-      The File Hosting Service on Web3Q
+      The File Hosting Service on Arbitrum Nova
     </p>
     <w3q-deployer multiple :fileContract="contract" style="width: 500px"/>
   </div>
