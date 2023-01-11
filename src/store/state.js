@@ -1,7 +1,7 @@
 export const chains = [
 {
   chainID: '0x66eed', // arb-gorli
-  FileBoxController:'0xDd57e21ce75C9C28205032B3b3510da9523764d2',
+  FileBoxController:'0x50391dAD45F1974B0C4904d7388Fda37086c50E4',
 },
 {
   chainID: '0xa4ba', // nova

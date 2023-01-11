@@ -8,8 +8,8 @@ const FileContractInfo = {
     "function removes(bytes[] memory names) public",
     "function countChunks(bytes memory name) external view returns (uint256)",
     "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)",
-    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types,string[] memory urls)",
-    "function gateway() public view returns (string memory)"
+    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types)",
+    "function fileFD() public view returns (address)"
   ],
 };
 
@@ -20,6 +20,19 @@ export const FileContract = (address) => {
   const contract = new ethers.Contract(address, FileContractInfo.abi, provider);
   return contract.connect(provider.getSigner());
 };
+
+export const getGateway = (chainId, fileFD) => {
+  // https://0xdc245a328fda8205846fad9e6421a27f7b07a912.arb-goerli.w3link.io/
+  switch (chainId) {
+    case "0xd06":
+      return "https://file.w3q.w3q-g.w3link.io/";
+    case "0x66eed":
+      return "https://" + fileFD + ".arb-goerli.w3link.io/";
+    case "0xa4ba":
+      return "https://" + fileFD + ".arb-nova.w3link.io/";
+  }
+  return "";
+}
 
 const readFile = (file) => {
   return new Promise((resolve) => {
@@ -135,8 +148,11 @@ const request = async ({
     }
   }
   if (uploadState) {
-    const gateway = await fileContract.gateway();
-    const url = gateway + account + "/" + name;
+    const [chainId, fileFD] = await Promise.all([
+      window.ethereum.request({method: "eth_chainId"}),
+      fileContract.fileFD(),
+    ]);
+    const url = getGateway(chainId, fileFD) + account + "/" + name;
     onSuccess({ path: url});
   } else {
     onError(new Error('upload request failed!'));

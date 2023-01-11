@@ -329,6 +329,13 @@ export default {
   width: 190px;
   text-align: left;
 }
+a {
+  color: #2dce89;
+}
+a:hover {
+  color: #2dce8990;
+}
+
 .go-upload-list-item-delete {
   font-size: 20px;
   width: 30px;
