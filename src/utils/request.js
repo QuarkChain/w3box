@@ -8,7 +8,8 @@ const FileContractInfo = {
     "function removes(bytes[] memory names) public",
     "function countChunks(bytes memory name) external view returns (uint256)",
     "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)",
-    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types,string[] memory urls)"
+    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types,string[] memory urls)",
+    "function gateway() public view returns (string memory)"
   ],
 };
 
@@ -90,12 +91,11 @@ const request = async ({
   const hexName = stringToHex(name);
   const hexType = stringToHex(rawFile.type);
   // Data need to be sliced if file > 475K
-  let fileSize = rawFile.size;
+  const fileSize = rawFile.size;
   let chunks = [];
-  if (fileSize > 475 * 1024) {
-    const chunkSize = Math.ceil(fileSize / (475 * 1024));
+  if (fileSize > 24 * 1024 - 326) {
+    const chunkSize = Math.ceil(fileSize / (24 * 1024 - 326));
     chunks = bufferChunk(content, chunkSize);
-    fileSize = fileSize / chunkSize;
   } else {
     chunks.push(content);
   }
@@ -110,10 +110,6 @@ const request = async ({
   let uploadState = true;
   for (const index in chunks) {
     const chunk = chunks[index];
-    let cost = 0;
-    if (fileSize > 24 * 1024 - 326) {
-      cost = Math.floor((fileSize + 326) / 1024 / 24);
-    }
     const hexData = '0x' + chunk.toString('hex');
     const localHash = '0x' + sha3(chunk);
     const hash = await fileContract.getChunkHash(hexName, index);
@@ -125,9 +121,7 @@ const request = async ({
 
     try {
       // file is remove or change
-      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData, {
-        value: ethers.utils.parseEther(cost.toString())
-      });
+      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData);
       console.log(`Transaction Id: ${tx.hash}`);
       const receipt = await tx.wait();
       if (!receipt.status) {
@@ -141,7 +135,8 @@ const request = async ({
     }
   }
   if (uploadState) {
-    const url = "https://galileo.web3q.io/file.w3q/" + account + "/" + name;
+    const gateway = await fileContract.gateway();
+    const url = gateway + account + "/" + name;
     onSuccess({ path: url});
   } else {
     onError(new Error('upload request failed!'));

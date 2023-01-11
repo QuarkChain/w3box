@@ -120,8 +120,8 @@ export default {
     },
     normalizeFiles (rawFile) {
       let chunkSize = 1;
-      if (rawFile.size > 475 * 1024) {
-        chunkSize = Math.ceil(rawFile.size / (475 * 1024));
+      if (rawFile.size > 24 * 1024 - 326) {
+        chunkSize = Math.ceil(rawFile.size / (24 * 1024 - 326));
       }
       const file = {
         name: rawFile.name,
