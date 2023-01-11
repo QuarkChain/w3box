@@ -28,8 +28,10 @@ export class UnsupportedChainIdError extends Error {
 
 const chain = 421613;
 const chainID = `0x${chain.toString(16)}`;
-const nodes = ['https://nova.arbitrum.io/rpc']
-const explorers = ['https://nova.arbiscan.io/'];
+// const nodes = ['https://nova.arbitrum.io/rpc']
+// const explorers = ['https://nova.arbiscan.io/'];
+const nodes = ['https://goerli-rollup.arbitrum.io/rpc/']
+const explorers = ['https://goerli-rollup-explorer.arbitrum.io/'];
 
 export default {
   name: "Wallet",
