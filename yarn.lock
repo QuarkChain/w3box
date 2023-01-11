@@ -4377,10 +4377,10 @@ ethers@^5.5.4:
     "@ethersproject/web" "5.5.1"
     "@ethersproject/wordlists" "5.5.0"
 
-ethfs-uploader@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/ethfs-uploader/-/ethfs-uploader-1.0.0.tgz#82a743cf37d207f1c29ab9f42b3fd8ef3de885ed"
-  integrity sha512-8zSkuAM8YLmr9wf6ApNtN8SUCcJVYOUE3fU829rxy+r8ndLK3t6U7bfR7cZwMm5NbV1ONv2MjIlbHyy7AIWOhg==
+ethfs-uploader@^1.1.8:
+  version "1.1.8"
+  resolved "https://registry.npmjs.org/ethfs-uploader/-/ethfs-uploader-1.1.8.tgz#d2c5491964b763958ac34367cc6883d3c8b040e7"
+  integrity sha512-YF+8pr1D74FT0YUni2oxckKXneURD1JPmfvLPEYjjVyu1tbuO6jDu2T2nwbqmtWk8iWYy28TV/Gy6jso87aTiw==
   dependencies:
     colors-cli "^1.0.28"
     eth-ens-namehash "^2.0.8"

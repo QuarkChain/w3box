@@ -8,7 +8,8 @@ const FileContractInfo = {
     "function removes(bytes[] memory names) public",
     "function countChunks(bytes memory name) external view returns (uint256)",
     "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)",
-    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types,string[] memory urls)"
+    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types)",
+    "function fileFD() public view returns (address)"
   ],
 };
 
@@ -19,6 +20,19 @@ export const FileContract = (address) => {
   const contract = new ethers.Contract(address, FileContractInfo.abi, provider);
   return contract.connect(provider.getSigner());
 };
+
+export const getGateway = (chainId, fileFD) => {
+  // https://0xdc245a328fda8205846fad9e6421a27f7b07a912.arb-goerli.w3link.io/
+  switch (chainId) {
+    case "0xd06":
+      return "https://file.w3q.w3q-g.w3link.io/";
+    case "0x66eed":
+      return "https://" + fileFD + ".arb-goerli.w3link.io/";
+    case "0xa4ba":
+      return "https://" + fileFD + ".arb-nova.w3link.io/";
+  }
+  return "";
+}
 
 const readFile = (file) => {
   return new Promise((resolve) => {
@@ -90,12 +104,11 @@ const request = async ({
   const hexName = stringToHex(name);
   const hexType = stringToHex(rawFile.type);
   // Data need to be sliced if file > 475K
-  let fileSize = rawFile.size;
+  const fileSize = rawFile.size;
   let chunks = [];
-  if (fileSize > 475 * 1024) {
-    const chunkSize = Math.ceil(fileSize / (475 * 1024));
+  if (fileSize > 24 * 1024 - 326) {
+    const chunkSize = Math.ceil(fileSize / (24 * 1024 - 326));
     chunks = bufferChunk(content, chunkSize);
-    fileSize = fileSize / chunkSize;
   } else {
     chunks.push(content);
   }
@@ -110,10 +123,6 @@ const request = async ({
   let uploadState = true;
   for (const index in chunks) {
     const chunk = chunks[index];
-    let cost = 0;
-    if (fileSize > 24 * 1024 - 326) {
-      cost = Math.floor((fileSize + 326) / 1024 / 24);
-    }
     const hexData = '0x' + chunk.toString('hex');
     const localHash = '0x' + sha3(chunk);
     const hash = await fileContract.getChunkHash(hexName, index);
@@ -125,9 +134,7 @@ const request = async ({
 
     try {
       // file is remove or change
-      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData, {
-        value: ethers.utils.parseEther(cost.toString())
-      });
+      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData);
       console.log(`Transaction Id: ${tx.hash}`);
       const receipt = await tx.wait();
       if (!receipt.status) {
@@ -141,7 +148,11 @@ const request = async ({
     }
   }
   if (uploadState) {
-    const url = "https://galileo.web3q.io/file.w3q/" + account + "/" + name;
+    const [chainId, fileFD] = await Promise.all([
+      window.ethereum.request({method: "eth_chainId"}),
+      fileContract.fileFD(),
+    ]);
+    const url = getGateway(chainId, fileFD) + account + "/" + name;
     onSuccess({ path: url});
   } else {
     onError(new Error('upload request failed!'));
