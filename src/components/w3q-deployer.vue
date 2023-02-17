@@ -183,8 +183,8 @@ export default {
       this.onError(error, file, this.files);
       if (error instanceof NotEnoughBalance) {
         this.$notify.error({
-          title: 'Fail',
-          message: 'Not enough balance!'
+          title: 'Not enough balance!',
+          message: 'File >=24kb requires staking token.'
         });
       }
     },
