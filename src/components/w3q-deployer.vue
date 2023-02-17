@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import request from '@/utils/request';
+import {NotEnoughBalance, request} from '@/utils/request';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
 const copy = require('clipboard-copy')
@@ -181,6 +181,12 @@ export default {
       delete this.reqs[uid];
       file.status = 'failure';
       this.onError(error, file, this.files);
+      if (error instanceof NotEnoughBalance) {
+        this.$notify.error({
+          title: 'Fail',
+          message: 'Not enough balance!'
+        });
+      }
     },
     handleSuccess(file, response) {
       const { uid } = file;

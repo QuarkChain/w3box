@@ -58,7 +58,7 @@ const clearOldFile = async (fileContract, chunkSize, hexName) => {
   return true;
 }
 
-const request = async ({
+export const request = async ({
   contractAddress,
   dirPath,
   file,
@@ -108,6 +108,7 @@ const request = async ({
   }
 
   let uploadState = true;
+  let notEnoughBalance = false;
   for (const index in chunks) {
     const chunk = chunks[index];
     let cost = 0;
@@ -125,6 +126,14 @@ const request = async ({
 
     try {
       // file is remove or change
+      const balance = await fileContract.provider.getBalance(account[0]);
+      if(balance.lte(ethers.utils.parseEther(cost.toString()))){
+        // not enough balance
+        uploadState = false;
+        notEnoughBalance = true;
+        break;
+      }
+
       const tx = await fileContract.writeChunk(hexName, hexType, index, hexData, {
         value: ethers.utils.parseEther(cost.toString())
       });
@@ -144,8 +153,12 @@ const request = async ({
     const url = "https://galileo.web3q.io/file.w3q/" + account + "/" + name;
     onSuccess({ path: url});
   } else {
-    onError(new Error('upload request failed!'));
+    if (notEnoughBalance) {
+      onError(new NotEnoughBalance('Not enough balance'));
+    } else {
+      onError(new Error('upload request failed!'));
+    }
   }
 };
 
-export default request;
+export class NotEnoughBalance extends Error {}
