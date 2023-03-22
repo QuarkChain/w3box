@@ -121,7 +121,7 @@ export default {
   margin: 0 10px;
 }
 
-@media screen and (max-width: 420px) {
+@media screen and (max-width: 500px) {
   .footer-img {
     width: 28px;
   }

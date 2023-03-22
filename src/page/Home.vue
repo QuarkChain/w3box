@@ -4,7 +4,7 @@
     <p class="title">
       The File Hosting Service on Web3Q
     </p>
-    <w3q-deployer multiple :fileContract="contract" :account="account" style="width: 500px"/>
+    <w3q-deployer multiple :fileContract="contract" :account="account" class="drop"/>
   </div>
 </template>
 
@@ -47,5 +47,26 @@ export default {
   margin-bottom: 55px;
   margin-top: 30px;
   line-height: 50px;
+}
+
+.drop {
+  width: 600px
+}
+@media screen and (max-width: 500px) {
+  .home-logo {
+    margin-top: 35px;
+    width: 180px;
+  }
+
+  .title {
+    font-size: 22px;
+    margin-bottom: 30px;
+    margin-top: 30px;
+    line-height: 30px;
+  }
+
+  .drop {
+    width: 98%
+  }
 }
 </style>
