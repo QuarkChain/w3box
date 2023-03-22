@@ -59,6 +59,7 @@ const clearOldFile = async (fileContract, chunkSize, hexName) => {
 }
 
 export const request = async ({
+  account,
   contractAddress,
   dirPath,
   file,
@@ -66,23 +67,6 @@ export const request = async ({
   onError,
   onProgress
 }) => {
-  if (!window.ethereum) {
-    onError(new Error("Can't find metamask"));
-    return;
-  }
-  let account;
-  try {
-    account = await window.ethereum.enable();
-    if (!account) {
-      onError(new Error("Can't get Account"));
-      return;
-    }
-  } catch (e) {
-    onError(new Error("Can't get Account"));
-    return;
-  }
-
-
   const rawFile = file.raw;
   const content = await readFile(rawFile);
   // file name
@@ -107,14 +91,14 @@ export const request = async ({
     return;
   }
 
+  let cost = 0;
+  if (fileSize > 24 * 1024 - 326) {
+    cost = Math.floor((fileSize + 326) / 1024 / 24);
+  }
   let uploadState = true;
   let notEnoughBalance = false;
   for (const index in chunks) {
     const chunk = chunks[index];
-    let cost = 0;
-    if (fileSize > 24 * 1024 - 326) {
-      cost = Math.floor((fileSize + 326) / 1024 / 24);
-    }
     const hexData = '0x' + chunk.toString('hex');
     const localHash = '0x' + sha3(chunk);
     const hash = await fileContract.getChunkHash(hexName, index);
@@ -126,7 +110,7 @@ export const request = async ({
 
     try {
       // file is remove or change
-      const balance = await fileContract.provider.getBalance(account[0]);
+      const balance = await fileContract.provider.getBalance(account);
       if(balance.lte(ethers.utils.parseEther(cost.toString()))){
         // not enough balance
         uploadState = false;

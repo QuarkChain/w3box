@@ -30,6 +30,10 @@ export default {
   name: 'w3q-deployer',
   components: { UploadDragger, UploadList },
   props: {
+    account: {
+      type: String,
+      default: ""
+    },
     fileContract: {
       type: String,
       default: ""
@@ -140,6 +144,7 @@ export default {
     normalizeReq (file) {
       const { uid } = file;
       this.reqs[uid] = {
+        account: this.account,
         contractAddress: this.fileContract,
         dirPath: this.dirPath,
         file: file,

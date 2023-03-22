@@ -4,7 +4,7 @@
     <p class="title">
       The File Hosting Service on Web3Q
     </p>
-    <w3q-deployer multiple :fileContract="contract" style="width: 500px"/>
+    <w3q-deployer multiple :fileContract="contract" :account="account" style="width: 500px"/>
   </div>
 </template>
 
@@ -21,6 +21,9 @@ export default {
         return FileBoxController;
       }
       return null;
+    },
+    account() {
+      return this.$store.state.account;
     }
   }
 }
