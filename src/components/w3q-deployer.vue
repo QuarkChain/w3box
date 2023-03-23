@@ -73,6 +73,10 @@ export default {
   computed: {
     enable() {
       return this.fileContract !== null;
+    },
+    chunkLength() {
+      return (window.ethereum && window.ethereum.isTrust)
+          ? 24 * 1024 : 475 * 1024;
     }
   },
   methods: {
@@ -124,8 +128,8 @@ export default {
     },
     normalizeFiles (rawFile) {
       let chunkSize = 1;
-      if (rawFile.size > 475 * 1024) {
-        chunkSize = Math.ceil(rawFile.size / (475 * 1024));
+      if (rawFile.size > this.chunkLength) {
+        chunkSize = Math.ceil(rawFile.size / this.chunkLength);
       }
       const file = {
         name: rawFile.name,
@@ -144,6 +148,7 @@ export default {
     normalizeReq (file) {
       const { uid } = file;
       this.reqs[uid] = {
+        chunkLength: this.chunkLength,
         account: this.account,
         contractAddress: this.fileContract,
         dirPath: this.dirPath,

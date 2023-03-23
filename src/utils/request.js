@@ -59,6 +59,7 @@ const clearOldFile = async (fileContract, chunkSize, hexName) => {
 }
 
 export const request = async ({
+  chunkLength,
   account,
   contractAddress,
   dirPath,
@@ -76,8 +77,8 @@ export const request = async ({
   // Data need to be sliced if file > 475K
   let fileSize = rawFile.size;
   let chunks = [];
-  if (fileSize > 475 * 1024) {
-    const chunkSize = Math.ceil(fileSize / (475 * 1024));
+  if (fileSize > chunkLength) {
+    const chunkSize = Math.ceil(fileSize / chunkLength);
     chunks = bufferChunk(content, chunkSize);
     fileSize = fileSize / chunkSize;
   } else {
