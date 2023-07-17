@@ -68,7 +68,7 @@ const copy = require('clipboard-copy')
 const hexToString = (h) => ethers.utils.toUtf8String(h);
 
 export default {
-  name: 'Profile',
+  name: 'ProfilePage',
   data: () => {
     return {
       name: "",

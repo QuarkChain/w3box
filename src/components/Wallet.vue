@@ -28,13 +28,13 @@ export class UnsupportedChainIdError extends Error {
   }
 }
 
-const chain = 3334;
+const chain = 421613;
 const chainID = `0x${chain.toString(16)}`;
-const nodes = ['https://galileo.web3q.io:8545']
-const explorers = [`https://explorer.galileo.web3q.io/`];
+const nodes = ['https://arbitrum-goerli.publicnode.com']
+const explorers = [`https://goerli-rollup-explorer.arbitrum.io/`];
 
 export default {
-  name: "Wallet",
+  name: "WalletComponent",
   props: {},
 
   data: () => ({
@@ -138,10 +138,10 @@ export default {
             params: [
               {
                 chainId: chainID,
-                chainName: 'Web3Q Galileo',
+                chainName: 'Arbitrum Goerli',
                 nativeCurrency: {
-                  name: 'W3Q',
-                  symbol: 'W3Q',
+                  name: 'ETH',
+                  symbol: 'ETH',
                   decimals: 18,
                 },
                 rpcUrls: nodes,
