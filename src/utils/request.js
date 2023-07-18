@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+// import {createSessionForSmartAccount} from "@/utils/zerodev";
 const sha3 = require('js-sha3').keccak_256;
 
 const FileContractInfo = {
@@ -19,6 +20,10 @@ export const FileContract = (address) => {
   const contract = new ethers.Contract(address, FileContractInfo.abi, provider);
   return contract.connect(provider.getSigner());
 };
+// export const FileContract = async (address) => {
+//   const sessionSinger = await createSessionForSmartAccount();
+//   return new ethers.Contract(address, FileContractInfo.abi, sessionSinger);
+// };
 
 const readFile = (file) => {
   return new Promise((resolve) => {
@@ -74,17 +79,17 @@ export const request = async ({
   const name = dirPath + rawFile.name;
   const hexName = stringToHex(name);
   const hexType = stringToHex(rawFile.type);
+  const fileSize = rawFile.size;
   // Data need to be sliced if file > 475K
-  let fileSize = rawFile.size;
   let chunks = [];
   if (fileSize > chunkLength) {
     const chunkSize = Math.ceil(fileSize / chunkLength);
     chunks = bufferChunk(content, chunkSize);
-    fileSize = fileSize / chunkSize;
   } else {
     chunks.push(content);
   }
 
+  // const fileContract = await FileContract(contractAddress);
   const fileContract = FileContract(contractAddress);
   const clear = await clearOldFile(fileContract, chunks.length, hexName, hexType)
   if (!clear) {
@@ -92,10 +97,6 @@ export const request = async ({
     return;
   }
 
-  let cost = 0;
-  if (fileSize > 24 * 1024 - 326) {
-    cost = Math.floor((fileSize + 326) / 1024 / 24);
-  }
   let uploadState = true;
   let notEnoughBalance = false;
   for (const index in chunks) {
@@ -110,18 +111,16 @@ export const request = async ({
     }
 
     try {
-      // file is remove or change
-      const balance = await fileContract.provider.getBalance(account);
-      if(balance.lte(ethers.utils.parseEther(cost.toString()))){
-        // not enough balance
-        uploadState = false;
-        notEnoughBalance = true;
-        break;
-      }
+      // const balance = await fileContract.provider.getBalance(account);
+      // if(balance.lte(ethers.utils.parseEther(cost.toString()))){
+      //   // not enough balance
+      //   uploadState = false;
+      //   notEnoughBalance = true;
+      //   break;
+      // }
 
-      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData, {
-        value: ethers.utils.parseEther(cost.toString())
-      });
+      // file is remove or change
+      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData);
       console.log(`Transaction Id: ${tx.hash}`);
       const receipt = await tx.wait();
       if (!receipt.status) {
