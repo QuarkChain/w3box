@@ -1,10 +1,23 @@
 <template>
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
-    <p class="title">
-      The File Hosting Service on Web3Q
-    </p>
-    <w3q-deployer multiple :fileContract="contract" :account="account" class="drop"/>
+    <div v-if="!this.sessionKey">
+      <p class="title">
+        Silent upload, you need to use AA wallet and Session Key
+      </p>
+      <button
+          class="btn-create"
+          @click.stop="goAA"
+      >
+        Create&nbsp;&nbsp;|&nbsp;&nbsp;Manage
+      </button>
+    </div>
+    <div v-else>
+      <p class="title">
+        The File Hosting Service on Arbitrum Goerli
+      </p>
+      <w3q-deployer multiple :fileContract="contract" :account="aaAccount" class="drop"/>
+    </div>
   </div>
 </template>
 
@@ -22,8 +35,16 @@ export default {
       }
       return null;
     },
-    account() {
-      return this.$store.state.account;
+    aaAccount() {
+      return this.$store.state.aaAccount;
+    },
+    sessionKey() {
+      return this.$store.state.sessionKey;
+    }
+  },
+  methods: {
+    goAA(){
+      this.$router.push({path: "/aa"});
     }
   }
 }
@@ -52,6 +73,23 @@ export default {
 .drop {
   width: 600px
 }
+
+.btn-create {
+  transition: all 0.1s ease 0s;
+  width: 180px;
+  height: 52px;
+  color: #ffffff;
+  font-size: 18px;
+  border: 0;
+  background: #52DEFF;
+  border-radius: 36px;
+  cursor: pointer;
+}
+.btn-create:hover {
+  background-color: #52DEFF90;
+  border: 0;
+}
+
 @media screen and (max-width: 500px) {
   .home-logo {
     margin-top: 35px;

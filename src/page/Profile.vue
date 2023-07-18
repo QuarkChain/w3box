@@ -232,7 +232,7 @@ export default {
 
 .domain-loading {
   min-width: 40vw;
-  min-height: 50vh;
+  min-height: 60vh;
 }
 .domain-loading >>> .el-loading-mask{
   background: transparent !important;

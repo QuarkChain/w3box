@@ -11,7 +11,7 @@
       <div class="account">
         {{ this.accountShort }}
         &nbsp;|&nbsp;
-        {{ this.networkId === 3334 ? "Galileo Testnet": "Mainnet" }}
+        Arb Goerli
       </div>
       <div class="favorite" @click.stop="goProfile"/>
     </div>
@@ -21,6 +21,7 @@
 <script>
 import { mapActions } from "vuex";
 import { chains } from '@/store/state';
+import {getAAAccount, getActiveSessionKey} from "@/utils/zerodev";
 
 export class UnsupportedChainIdError extends Error {
   constructor() {
@@ -59,7 +60,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["setChainConfig", "setAccount"]),
+    ...mapActions(["setChainConfig", "setAccount", "setAAAccount", "setSessionKey"]),
     connectWallet() {
       if (!window.ethereum) {
         this.$message.error('Can\'t setup the Web3Q network on metamask because window.ethereum is undefined');
@@ -72,6 +73,8 @@ export default {
       if (chainID !== newChainId) {
         this.currentAccount = null;
         this.setAccount(null);
+        this.setAAAccount(null);
+        this.setSessionKey(null);
         this.setChainConfig({});
       } else {
         const c = chains.find((v) => v.chainID === chainID);
@@ -96,6 +99,8 @@ export default {
       if (accounts.length === 0) {
         this.currentAccount = null;
         this.setAccount(null);
+        this.setAAAccount(null);
+        this.setSessionKey(null);
         console.warn(
           "MetaMask is locked or the user has not connected any accounts"
         );
@@ -104,12 +109,15 @@ export default {
       if (chainID !== newChainId) {
         this.currentAccount = null;
         this.setAccount(null);
+        this.setAAAccount(null);
+        this.setSessionKey(null);
         throw new UnsupportedChainIdError();
       }
 
       if (accounts[0] !== this.currentAccount) {
         this.currentAccount = accounts[0];
         this.setAccount(accounts[0]);
+        this.initAAInfo().then();
       }
     },
     async login() {
@@ -166,6 +174,14 @@ export default {
     },
     goProfile(){
       this.$router.push({path: "/address/" + this.currentAccount});
+    },
+    async initAAInfo() {
+      const aaAddress = await getAAAccount();
+      this.setAAAccount(aaAddress);
+      const sessionKey = getActiveSessionKey(this.currentAccount);
+      if (sessionKey) {
+        this.setSessionKey(sessionKey);
+      }
     }
   },
 };
@@ -213,6 +229,7 @@ export default {
   border: 0;
   background: #52DEFF;
   border-radius: 36px;
+  cursor: pointer;
 }
 .btn-connect:hover {
   background-color: #52DEFF90;
