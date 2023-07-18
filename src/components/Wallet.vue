@@ -175,13 +175,16 @@ export default {
     goProfile(){
       this.$router.push({path: "/address/" + this.currentAccount});
     },
+    goAA() {
+      this.$router.push({path: "/aa"});
+    },
     async initAAInfo() {
-      const aaAddress = await getAAAccount();
-      this.setAAAccount(aaAddress);
       const sessionKey = getActiveSessionKey(this.currentAccount);
       if (sessionKey) {
         this.setSessionKey(sessionKey);
       }
+      const aaAddress = await getAAAccount();
+      this.setAAAccount(aaAddress);
     }
   },
 };

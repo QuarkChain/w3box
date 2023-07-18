@@ -1,10 +1,11 @@
-import {deserializeSessionKeyData} from "@zerodevapp/sdk/dist/src/session";
+import { deserializeSessionKeyData } from "@zerodevapp/sdk/dist/src/session";
 import {
-  getZeroDevSigner,
   getRPCProviderOwner,
+  getZeroDevSigner,
   createSessionKey,
+  createSessionKeySigner
 } from "@zerodevapp/sdk";
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
 
 export const projectId = '1ca3939f-3e50-4aef-a4bd-7b86eb45ffde';
 
@@ -42,9 +43,8 @@ export const getAAAccount = async () => {
 export const getSessionKey = (owner) => {
   const sessionInfo = querySessionKey(owner);
   if (sessionInfo) {
-    const session = deserializeSessionKeyData(sessionInfo.sessionKey);
     return {
-      time: Number(session.validUntil) * 1000,
+      time: Number(sessionInfo.time) * 1000,
       address: sessionInfo.address,
     }
   }
@@ -61,7 +61,6 @@ export const getActiveSessionKey = (owner) => {
 
 export const createSessionAccount = async (zeroSigner, contractAddress, owner) => {
   const time = Math.floor(Date.now() / 1000) + sessionKeyTime;
-  const wallet = ethers.Wallet.createRandom();
   const sessionKey = await createSessionKey(
       zeroSigner,
       [
@@ -70,25 +69,32 @@ export const createSessionAccount = async (zeroSigner, contractAddress, owner) =
           selectors: [], // all method // nftContract.interface.getSighash('function2'),
         },
       ],
-      time,
-      wallet.address
+      time
   );
-  await saveSessionKey(owner, {
-    address: wallet.address,
-    pk: wallet.privateKey,
-    sessionKey,
-  });
 
+  const SessionKeyData = deserializeSessionKeyData(sessionKey);
+  const wallet = new ethers.Wallet(SessionKeyData.sessionPrivateKey);
+  const address = await wallet.getAddress();
+
+  await saveSessionKey(owner, {time, address, sessionKey});
   return {
     time: time * 1000,
-    address: wallet.address,
+    address
   }
 };
 
-// export const sendSessionTransaction = async (sessionSinger, fileType, chunkId, name, data) => {
-//   const contract = new Contract(ethStorageAddress, ethStorageAbi, sessionSinger);
-//   const receipt = await contract.writeChunk(fileType, chunkId, name, data);
-//   const v = await receipt.wait();
-//   console.log(v);
-//   return true;
-// };
+export const createSessionForSmartAccount = async () => {
+  const owner = await getEOAAccount();
+  const sessionInfo = querySessionKey(owner);
+  return await createSessionKeySigner({
+    projectId,
+    sessionKeyData: sessionInfo.sessionKey
+  });
+};
+
+export const getEOAAccount = async () => {
+  const accounts = await window.ethereum.request({
+    method: 'eth_accounts',
+  });
+  return accounts[0];
+};
