@@ -11,8 +11,6 @@
 <script>
 import W3qDeployer from '@/components/w3q-deployer.vue';
 
-// const { getZeroDevSigner, getRPCProviderOwner, createSessionKey } = require('@zerodevapp/sdk')
-
 export default {
   name: 'HomePage',
   components: {W3qDeployer},
@@ -27,25 +25,7 @@ export default {
     account() {
       return this.$store.state.account;
     }
-  },
-  // async created() {
-  //   const projectId = '1ca3939f-3e50-4aef-a4bd-7b86eb45ffde';
-  //   const wallet = getRPCProviderOwner(window.ethereum);
-  //   const signer = await getZeroDevSigner({
-  //     projectId,
-  //     owner: wallet,
-  //   });
-  //   const address = await signer.getAddress()
-  //   console.log('My address:', address)
-  //
-  //   const sessionKeyTime = Math.floor(Date.now() / 1000) + 8 * 60 * 60;
-  //   const sessionKey = await createSessionKey(
-  //       signer,
-  //       [],
-  //       sessionKeyTime,
-  //   );
-  //   console.log('My address:', sessionKey)
-  // }
+  }
 }
 </script>
 
