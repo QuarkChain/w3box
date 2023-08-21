@@ -3,7 +3,7 @@
     <img class="home-logo" src="../assets/home.png"/>
     <div v-if="!this.sessionKey">
       <p class="title">
-        Silent upload, you need to use AA wallet and Session Key
+        To upload files silently, you need <br/> an AA wallet and an activated Session Key.
       </p>
       <button
           class="btn-create"
@@ -43,7 +43,7 @@ export default {
     }
   },
   methods: {
-    goAA(){
+    goAA() {
       this.$router.push({path: "/aa"});
     }
   }

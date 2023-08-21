@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-// import {createSessionForSmartAccount} from "@/utils/zerodev";
+import {createSessionForSmartAccount} from "@/utils/zerodev";
 const sha3 = require('js-sha3').keccak_256;
 
 const FileContractInfo = {
@@ -15,15 +15,10 @@ const FileContractInfo = {
 
 const stringToHex = (s) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(s));
 
-export const FileContract = (address) => {
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const contract = new ethers.Contract(address, FileContractInfo.abi, provider);
-  return contract.connect(provider.getSigner());
+const FileContract = async (address) => {
+  const sessionSinger = await createSessionForSmartAccount();
+  return new ethers.Contract(address, FileContractInfo.abi, sessionSinger);
 };
-// export const FileContract = async (address) => {
-//   const sessionSinger = await createSessionForSmartAccount();
-//   return new ethers.Contract(address, FileContractInfo.abi, sessionSinger);
-// };
 
 const readFile = (file) => {
   return new Promise((resolve) => {
@@ -89,8 +84,7 @@ export const request = async ({
     chunks.push(content);
   }
 
-  // const fileContract = await FileContract(contractAddress);
-  const fileContract = FileContract(contractAddress);
+  const fileContract = await FileContract(contractAddress);
   const clear = await clearOldFile(fileContract, chunks.length, hexName, hexType)
   if (!clear) {
     onError(new Error("Check Old File Fail!"));
@@ -120,6 +114,7 @@ export const request = async ({
       // }
 
       // file is remove or change
+      console.log(hexName, hexType, index);
       const tx = await fileContract.writeChunk(hexName, hexType, index, hexData);
       console.log(`Transaction Id: ${tx.hash}`);
       const receipt = await tx.wait();
@@ -129,6 +124,7 @@ export const request = async ({
       }
       onProgress({ percent: Number(index) + 1});
     } catch (e) {
+      console.log(e)
       uploadState = false;
       break;
     }

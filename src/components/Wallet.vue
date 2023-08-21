@@ -13,7 +13,17 @@
         &nbsp;|&nbsp;
         Arb Goerli
       </div>
-      <div class="favorite" @click.stop="goProfile"/>
+
+      <el-popover
+          placement="bottom"
+          width="180"
+          trigger="click">
+        <div>
+          <div class="el-menu-item item-ui" @click.stop="goAA">My Session Keys</div>
+          <div class="el-menu-item item-ui" @click.stop="goProfile">My Files</div>
+        </div>
+        <div class="favorite" slot="reference"/>
+      </el-popover>
     </div>
   </div>
 </template>
@@ -237,5 +247,9 @@ export default {
 .btn-connect:hover {
   background-color: #52DEFF90;
   border: 0;
+}
+
+.item-ui {
+  font-size: 16px;
 }
 </style>

@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@ethereumjs/util": "^9.0.0",
     "@zerodevapp/sdk": "^3.1.53",
     "bignumber.js": "^9.0.0",
     "buefy": "^0.9.17",

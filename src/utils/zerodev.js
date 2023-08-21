@@ -34,11 +34,31 @@ export const getAASinger = async () => {
 }
 
 export const getAAAccount = async () => {
- const signer = await getAASinger();
+  const signer = await getAASinger();
   const address = await signer.getAddress()
   console.log('My address:', address)
   return address;
 }
+
+export const isCreated = async (address) => {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const bytecode = await provider.getCode(address);
+  return bytecode !== '0x';
+}
+
+export const createAAAccount = async () => {
+  const contractAddress = '0x9cA6feAB8e2d1e61FF9C98420D3B916c5cA846f3'
+  const contractABI = [
+    'function update() public'
+  ]
+  const signer = await getAASinger();
+  const nftContract = new ethers.Contract(contractAddress, contractABI, signer)
+  const tx = await nftContract.update();
+  const receipt = await tx.wait();
+  console.log(receipt);
+  return receipt.status;
+}
+
 
 export const getSessionKey = (owner) => {
   const sessionInfo = querySessionKey(owner);
@@ -98,3 +118,16 @@ export const getEOAAccount = async () => {
   });
   return accounts[0];
 };
+
+export const transferGas = async (receiverAddress, amountInEther) => {
+  let transaction = {
+    to: receiverAddress,
+    // Convert currency unit from ether to wei
+    value: ethers.utils.parseEther(amountInEther)
+  }
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const tx = await provider.sendTransaction(transaction);
+  const receipt = await tx.wait();
+  console.log(receipt);
+  return receipt.status;
+}
