@@ -68,14 +68,6 @@
 </template>
 
 <script>
-import {
-  isCreated,
-  createAAAccount,
-  createSessionAccount,
-  getAASinger,
-  getSessionKey,
-  transferGas
-} from "@/utils/zerodev";
 import {mapActions} from "vuex";
 import UpdateIcon from "../components/icon";
 
@@ -125,9 +117,9 @@ export default {
   },
   asyncComputed: {
     async isCreateAA() {
-      if(this.aaAccount) {
-        return await isCreated(this.aaAccount);
-      }
+      // if(this.aaAccount) {
+      //   return await isCreated(this.aaAccount);
+      // }
       return false;
     }
   },
@@ -151,11 +143,11 @@ export default {
       if (!this.contract || !this.account) {
         return;
       }
-      this.aaSinger = await getAASinger();
-      this.aaAccount = await this.aaSinger.getAddress();
-      this.setAAAccount(this.aaAccount);
-      const sessionKey = getSessionKey(this.account);
-      this.result = sessionKey ? sessionKey : 'empty';
+      // this.aaSinger = await getAASinger();
+      // this.aaAccount = await this.aaSinger.getAddress();
+      // this.setAAAccount(this.aaAccount);
+      // const sessionKey = getSessionKey(this.account);
+      // this.result = sessionKey ? sessionKey : 'empty';
     },
     onCopy(){
       console.log(this.aaAccount)
@@ -195,61 +187,61 @@ export default {
     },
     async onTransfer() {
       if (!this.stakeAmount.isZero()) {
-        let receiverAddress = this.aaAccount;
-        let amountInEther = this.stakeAmount;
-        const result = await transferGas(receiverAddress, amountInEther);
-        if (result) {
-          this.$notify({
-            title: 'Success',
-            message: 'Transfer Gas Success',
-            type: 'success'
-          });
-          this.goAA();
-        } else {
-          this.$notify({
-            title: 'Error',
-            message: 'Transfer Gas Fail',
-            type: 'error'
-          });
-        }
+        // let receiverAddress = this.aaAccount;
+        // let amountInEther = this.stakeAmount;
+        // const result = await transferGas(receiverAddress, amountInEther);
+        // if (result) {
+        //   this.$notify({
+        //     title: 'Success',
+        //     message: 'Transfer Gas Success',
+        //     type: 'success'
+        //   });
+        //   this.goAA();
+        // } else {
+        //   this.$notify({
+        //     title: 'Error',
+        //     message: 'Transfer Gas Fail',
+        //     type: 'error'
+        //   });
+        // }
       }
     },
     async onCreateWallet() {
-      const result = await createAAAccount();
-      if (result) {
-        this.$notify({
-          title: 'Success',
-          message: 'Create Wallet Success',
-          type: 'success'
-        });
-        this.goAA();
-      } else {
-        this.$notify({
-          title: 'Error',
-          message: 'Create Wallet Fail',
-          type: 'error'
-        });
-      }
+      // const result = await createAAAccount();
+      // if (result) {
+      //   this.$notify({
+      //     title: 'Success',
+      //     message: 'Create Wallet Success',
+      //     type: 'success'
+      //   });
+      //   this.goAA();
+      // } else {
+      //   this.$notify({
+      //     title: 'Error',
+      //     message: 'Create Wallet Fail',
+      //     type: 'error'
+      //   });
+      // }
     },
     async createSession() {
-      createSessionAccount(this.aaSinger, this.contract, this.account)
-          .then((item) => {
-            this.result = item;
-            this.setSessionKey(item);
-            this.$notify({
-              title: 'Success',
-              message: 'Create Success',
-              type: 'success'
-            });
-          })
-          .catch((e) => {
-            console.log(e);
-            this.$notify({
-              title: 'Error',
-              message: 'Create Fail',
-              type: 'error'
-            });
-          });
+    //   createSessionAccount(this.aaSinger, this.contract, this.account)
+    //       .then((item) => {
+    //         this.result = item;
+    //         this.setSessionKey(item);
+    //         this.$notify({
+    //           title: 'Success',
+    //           message: 'Create Success',
+    //           type: 'success'
+    //         });
+    //       })
+    //       .catch((e) => {
+    //         console.log(e);
+    //         this.$notify({
+    //           title: 'Error',
+    //           message: 'Create Fail',
+    //           type: 'error'
+    //         });
+    //       });
     },
   }
 }

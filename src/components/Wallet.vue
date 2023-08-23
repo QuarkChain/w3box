@@ -8,22 +8,11 @@
       Connect
     </button>
     <div v-else class="user">
-      <div class="account">
-        {{ this.accountShort }}
-        &nbsp;|&nbsp;
-        Arb Goerli
+      <div class="metamask">
+        <div class="metamask-img" />
+        <div class="account">{{ this.accountShort }}</div>
       </div>
-
-      <el-popover
-          placement="bottom"
-          width="180"
-          trigger="click">
-        <div>
-          <div class="el-menu-item item-ui" @click.stop="goAA">My Session Keys</div>
-          <div class="el-menu-item item-ui" @click.stop="goProfile">My Files</div>
-        </div>
-        <div class="favorite" slot="reference"/>
-      </el-popover>
+      <div class="favorite" @click.stop="goProfile"/>
     </div>
   </div>
 </template>
@@ -31,7 +20,7 @@
 <script>
 import { mapActions } from "vuex";
 import { chains } from '@/store/state';
-import {getAAAccount, getActiveSessionKey} from "@/utils/zerodev";
+import {createSession, createWallet, signSeed} from "@/utils/Session";
 
 export class UnsupportedChainIdError extends Error {
   constructor() {
@@ -39,9 +28,9 @@ export class UnsupportedChainIdError extends Error {
   }
 }
 
-const chain = 421613;
+const chain = 3151908;
 const chainID = `0x${chain.toString(16)}`;
-const nodes = ['https://arbitrum-goerli.publicnode.com']
+const nodes = ['https://65.109.50.145:32773']
 const explorers = [`https://goerli-rollup-explorer.arbitrum.io/`];
 
 export default {
@@ -189,12 +178,11 @@ export default {
       this.$router.push({path: "/aa"});
     },
     async initAAInfo() {
-      const sessionKey = getActiveSessionKey(this.currentAccount);
-      if (sessionKey) {
-        this.setSessionKey(sessionKey);
-      }
-      const aaAddress = await getAAAccount();
-      this.setAAAccount(aaAddress);
+      // TODO
+      const sign = await signSeed(this.currentAccount);
+      const key = await createSession('', sign, '12345');
+      const wallet = createWallet(key);
+      console.log(wallet.address)
     }
   },
 };
@@ -211,21 +199,40 @@ export default {
   flex-direction: row;
 }
 
-.account {
+.metamask {
   height: 38px;
-  font-size: 15px;
-  line-height: 38px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 4px 4px 4px 8px;
   background: #FFFFFF;
-  border-radius: 36px;
   border: 1px solid #E8E6F2;
-  padding: 0 15px;
-  text-align: center;
 }
+.metamask-img {
+  width: 24px;
+  height: 24px;
+  background-image: url("../assets/metamask.svg");
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+  -moz-background-size:100% 100%;
+}
+.account {
+  font-size: 14px;
+  line-height: 30px;
+  background: #ECF0F9;
+  border-radius: 12px;
+  border: none;
+  padding: 0 8px;
+  text-align: center;
+  margin-left: 10px;
+}
+
 .favorite{
   cursor: pointer;
   height: 38px;
   width: 38px;
-  margin-left: 10px;
+  margin-left: 15px;
   padding: 0;
   background-image: url("../assets/user.png");
   background-repeat:no-repeat;
@@ -247,9 +254,5 @@ export default {
 .btn-connect:hover {
   background-color: #52DEFF90;
   border: 0;
-}
-
-.item-ui {
-  font-size: 16px;
 }
 </style>

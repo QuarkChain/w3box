@@ -1,12 +1,6 @@
-export const chains = [{
-  chainID: '0x14d',
-  FileBoxController:'0xCD469d20bc4da5F97DC350FDB02D6370559C9511',
-},
+export const chains = [
 {
-  chainID: '0xd06',
-  FileBoxController:'0x731Cd5311e9bAd1E99e7F1081A91a38c02b5F47d',
-},
-{
-  chainID: '0x66eed',
-  FileBoxController: '0x766d3d5643e0950049f2D6EcD03A8EcFEd098D1A',
-}];
+  chainID: '0x301824',
+  FileBoxController: '0xcD723F00A3D768A5D35376517e3b5EDEfE8E5A9f',
+}
+];

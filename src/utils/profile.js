@@ -1,4 +1,4 @@
-import { FileContract } from "./request";
+import { FileContract } from "./contract";
 
 // contract
 export const getUploadByAddress = async (controller, address) => {

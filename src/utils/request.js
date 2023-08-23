@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import {createSessionForSmartAccount} from "@/utils/zerodev";
 const sha3 = require('js-sha3').keccak_256;
 
 const FileContractInfo = {
@@ -16,8 +15,9 @@ const FileContractInfo = {
 const stringToHex = (s) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(s));
 
 const FileContract = async (address) => {
-  const sessionSinger = await createSessionForSmartAccount();
-  return new ethers.Contract(address, FileContractInfo.abi, sessionSinger);
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const contract = new ethers.Contract(address, FileContractInfo.abi, provider);
+  return contract.connect(provider.getSigner());
 };
 
 const readFile = (file) => {
