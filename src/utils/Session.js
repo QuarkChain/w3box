@@ -54,7 +54,10 @@ export const createSession = async (controller, signature, password) => {
   const tx = await fileContract.createSession(wallet.address, cipherIV, hexData);
   const receipt = await tx.wait();
   if (receipt.status) {
-    return sessionKey;
+    return {
+      sessionKey,
+      address: wallet.address
+    };
   }
   return "";
 }
@@ -71,5 +74,29 @@ export const encryptSession = async (signature, password, iv, encryptData) => {
     return driveKey;
   } catch (e) {
     return undefined;
+  }
+}
+
+export const saveSessionKey = (user, session) => {
+  window.sessionStorage.clear();
+  window.sessionStorage.setItem(user, session);
+}
+
+export const getSessionKey = (user) => {
+  return window.sessionStorage.getItem(user);
+}
+
+export const querySessionKey = async (contract) => {
+  const fileContract = FileContract(contract);
+  const result = await fileContract.getSession();
+  if(result.iv === '0x') {
+    // not register
+    return undefined;
+  } else {
+    return {
+      address: result.addr,
+      iv: result.iv,
+      encrypt: result.encrypt,
+    }
   }
 }
