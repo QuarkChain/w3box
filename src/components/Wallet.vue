@@ -29,7 +29,7 @@
         <el-input class="item-input" placeholder="Input Password" v-model="input" show-password />
         <div class="dialog_btn_layout">
           <el-button round class="dialog_btn" @click="onClose">Cancel</el-button>
-          <el-button type="warning" round class="records-btn" @click="onRegister">
+          <el-button type="warning" round class="records-btn" :loading="isRegister" @click="onRegister">
             Register
           </el-button>
         </div>
@@ -97,6 +97,7 @@ export default {
     signature: '',
     sessionResult: null,
 
+    isRegister: false,
     input: '',
   }),
   async created() {
@@ -143,7 +144,9 @@ export default {
         return;
       }
 
+      this.isRegister = true;
       const result = await createSession(this.contract, this.signature, password);
+      this.isRegister = false;
       if (result) {
         this.setSessionKey(result.sessionKey);
         this.setSessionAddr(result.address);
