@@ -3,12 +3,15 @@ import Vue from 'vue';
 import Element from 'element-ui';
 import AsyncComputed from 'vue-async-computed';
 import { Navbar } from 'buefy';
+import Buefy from 'buefy';
+
 
 import App from './App.vue'
 import router from './router';
 import store from './store';
 
 import 'element-ui/lib/theme-chalk/index.css';
+import 'buefy/dist/buefy.css';
 import './assets/css/all.css';
 
 Vue.use(Element)
@@ -16,6 +19,7 @@ Vue.use(AsyncComputed, {
   default: 0
 });
 Vue.use(Navbar);
+Vue.use(Buefy);
 
 Vue.config.productionTip = false
 

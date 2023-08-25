@@ -103,5 +103,6 @@ export const querySessionKey = async (contract) => {
 
 export const queryBalance = async (sessionAddress) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
-  return await provider.getBalance(sessionAddress);
+  const value = await provider.getBalance(sessionAddress);
+  return ethers.utils.formatEther(value);
 }

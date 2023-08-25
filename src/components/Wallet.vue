@@ -2,7 +2,7 @@
   <div id="wallet">
     <button
       class="btn-connect"
-      v-if="!this.currentAccount"
+      v-if="!this.account"
       @click.stop="connectWallet"
     >
       Connect
@@ -14,63 +14,13 @@
       </div>
       <div class="favorite" @click.stop="goProfile"/>
     </div>
-
-    <el-dialog :visible="this.showRegister"
-               :show-close="false"
-               :lock-scroll="false"
-               :append-to-body="true"
-               class="dialog_card" >
-      <div class="card-item">
-        <p class="item-title">Register Session Key</p>
-        <p class="item-message">
-          To enable transactions of the EIP-4844 type, it is required to create a SessionKey wallet, which <br/>
-          will serve as the payment wallet and perform background file uploads.
-        </p>
-        <el-input class="item-input" placeholder="Input Password" v-model="input" show-password />
-        <div class="dialog_btn_layout">
-          <el-button round class="dialog_btn" @click="onClose">Cancel</el-button>
-          <el-button type="warning" round class="records-btn" :loading="isRegister" @click="onRegister">
-            Register
-          </el-button>
-        </div>
-      </div>
-    </el-dialog>
-
-    <el-dialog :visible="this.showLogin"
-               :show-close="false"
-               :lock-scroll="false"
-               :append-to-body="true"
-               class="dialog_card" >
-      <div class="card-item">
-        <p class="item-title">Login Session Key</p>
-        <p class="item-message">
-          To enable transactions of the EIP-4844 type, it is required to create a SessionKey wallet, which <br/>
-          will serve as the payment wallet and perform background file uploads.
-        </p>
-        <el-input class="item-input" placeholder="Input Password" v-model="input" show-password />
-        <div class="dialog_btn_layout">
-          <el-button round class="dialog_btn" @click="onClose">Cancel</el-button>
-          <el-button type="warning" round class="records-btn" @click="onLogin">
-            Login
-          </el-button>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
 import { chains } from '@/store/state';
-import {
-  createSession,
-  createWallet,
-  encryptSession,
-  getSessionKey,
-  querySessionKey,
-  saveSessionKey,
-  signSeed
-} from "@/utils/Session";
+import { getAddress } from "@/utils/Particle";
 
 export class UnsupportedChainIdError extends Error {
   constructor() {
@@ -78,10 +28,10 @@ export class UnsupportedChainIdError extends Error {
   }
 }
 
-const chain = 7011893058;
+export const chain = 80001;
 const chainID = `0x${chain.toString(16)}`;
-const nodes = ['https://rpc.dencun-devnet-8.ethpandaops.io']
-const explorers = ['https://explorer.dencun-devnet-8.ethpandaops.io'];
+const nodes = ['https://rpc-mumbai.maticvigil.com']
+const explorers = ['https://mumbai.polygonscan.com'];
 
 export default {
   name: "WalletComponent",
@@ -90,21 +40,11 @@ export default {
   data: () => ({
     networkId: chain,
     currentAccount: null,
-    contract: null,
-
-    showRegister: false,
-    showLogin: false,
-    signature: '',
-    sessionResult: null,
-
-    isRegister: false,
-    input: '',
   }),
   async created() {
     const c = chains.find((v) => v.chainID === chainID);
     const config = JSON.parse(JSON.stringify(c));
     this.setChainConfig(config);
-    this.contract = config.FileBoxController;
 
     this.connectWallet();
     window.ethereum.on("chainChanged", this.handleChainChanged);
@@ -121,9 +61,12 @@ export default {
         )
       );
     },
+    account() {
+      return this.$store.state.account;
+    },
   },
   methods: {
-    ...mapActions(["setChainConfig", "setAccount", "setSessionKey", "setSessionAddr"]),
+    ...mapActions(["setChainConfig", "setAccount", "setAAAddress"]),
     goProfile(){
       this.$router.push({path: "/address/" + this.currentAccount});
     },
@@ -134,82 +77,28 @@ export default {
       }
       this.login();
     },
-    onClose() {
-      this.showRegister = false;
-    },
-    async onRegister() {
-      const password = this.input;
-      if (!password) {
-        this.$message.error('Invalid password');
-        return;
-      }
-
-      this.isRegister = true;
-      const result = await createSession(this.contract, this.signature, password);
-      this.isRegister = false;
-      if (result) {
-        this.setSessionKey(result.sessionKey);
-        this.setSessionAddr(result.address);
-        saveSessionKey(this.currentAccount, result.sessionKey);
-
-        this.showRegister = false;
-        this.$notify({
-          title: 'Success',
-          message: 'Register Success',
-          type: 'success'
-        });
-      } else {
-        this.$message.error('Register Fail!');
-      }
-    },
-    async onLogin() {
-      const password = this.input;
-      if (!password) {
-        this.$message.error('Invalid password');
-        return;
-      }
-
-      const sessionKey = await encryptSession(this.signature, password, this.sessionResult.iv, this.sessionResult.encrypt);
-      if (sessionKey) {
-        this.setSessionKey(sessionKey);
-        this.setSessionAddr(this.sessionResult.address);
-        saveSessionKey(this.currentAccount, sessionKey);
-
-        this.showLogin = false;
-        this.$notify({
-          title: 'Success',
-          message: 'Login Success',
-          type: 'success'
-        });
-      } else {
-        this.$message.error('Password Error');
-      }
-    },
     async handleChainChanged() {
       const newChainId = await window.ethereum.request({method: "eth_chainId"});
       if (chainID !== newChainId) {
-        this.setSessionKey(null);
-      } else {
-        if (this.currentAccount) {
-          const sessionKey = getSessionKey(this.currentAccount);
-          this.setSessionKey(sessionKey??null);
-        }
+        this.setAAAddress(null);
+      } else if (this.currentAccount) {
+        const address = await getAddress();
+        this.setAAAddress(address);
       }
     },
     async handleAccountsChanged(accounts) {
       if (accounts[0] !== this.currentAccount) {
-        this.setSessionKey(null);
+        this.setAAAddress(null);
       } else {
-        const sessionKey = getSessionKey(this.currentAccount);
-        this.setSessionKey(sessionKey??null);
+        const address = await getAddress();
+        this.setAAAddress(address);
       }
     },
     async handleAccounts(accounts) {
       if (accounts.length === 0) {
         this.currentAccount = null;
         this.setAccount(null);
-        this.setSessionKey(null);
-        this.setSessionAddr(null);
+        this.setAAAddress(null);
         console.warn(
             "MetaMask is locked or the user has not connected any accounts"
         );
@@ -223,7 +112,7 @@ export default {
 
       this.currentAccount = accounts[0];
       this.setAccount(accounts[0]);
-      await this.initSessionInfo();
+      await this.initAAInfo();
     },
     async login() {
       window.ethereum
@@ -253,8 +142,8 @@ export default {
                 chainId: chainID,
                 chainName: 'Ethereum Devnet',
                 nativeCurrency: {
-                  name: 'ETH',
-                  symbol: 'ETH',
+                  name: 'MATIC',
+                  symbol: 'MATIC',
                   decimals: 18,
                 },
                 rpcUrls: nodes,
@@ -273,35 +162,14 @@ export default {
           return false
         }
       } else {
-        this.$message.error('Can\'t setup the Web3Q network on metamask because window.ethereum is undefined');
+        this.$message.error('Can\'t switch the network on metamask because window.ethereum is undefined');
         return false
       }
     },
-    async initSessionInfo() {
-      const sessionKey = getSessionKey(this.currentAccount);
-      if(sessionKey) {
-        // login success
-        this.setSessionKey(sessionKey);
-        const wallet = createWallet(sessionKey);
-        this.setSessionAddr(wallet.address);
-      } else {
-        const sign = await signSeed(this.currentAccount, chain);
-        if (!sign) {
-          this.$message.error('User rejected sign');
-          return;
-        }
 
-        this.signature = sign;
-        const sessionResult = await querySessionKey(this.contract);
-        if (sessionResult) {
-          // is register, show login ui
-          this.sessionResult = sessionResult;
-          this.showLogin = true;
-        } else {
-          // not register, show sign ui
-          this.showRegister = true;
-        }
-      }
+    async initAAInfo() {
+      const address = await getAddress();
+      this.setAAAddress(address);
     },
   },
 };
@@ -373,70 +241,5 @@ export default {
 .btn-connect:hover {
   background-color: #52DEFF90;
   border: 0;
-}
-
-
-.dialog_card {
-}
-.dialog_card >>> .el-dialog{
-  border-radius: 16px;
-}
-
-.card-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-.item-title {
-  font-size: 20px;
-  color: #000000;
-  line-height: 20px;
-  font-weight: bold;
-}
-.item-message {
-  font-size: 15px;
-  color: #333333;
-  line-height: 28px;
-  margin-top: 30px;
-  width: 85%;
-}
-.item-input {
-  margin-top: 30px;
-  width: 50%;
-}
-
-.dialog_btn_layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 60px;
-  margin-bottom: 10px;
-}
-.dialog_btn {
-  border: 1px solid #52DEFF;
-  background: #FFFFFF;
-  font-size: 17px;
-  color: #52DEFF;
-  width: 110px;
-  margin-right: 40px;
-}
-.dialog_btn:focus,
-.dialog_btn:hover {
-  border: 1px solid #52DEFFA0;
-  color: #52DEFFA0;
-  background: #FFFFFFA0;
-}
-.records-btn {
-  background: #52DEFF;
-  border: 1px solid #52DEFF;
-  font-size: 17px;
-  width: 110px;
-}
-.records-btn:focus,
-.records-btn:hover {
-  background: #52DEFFA0;
-  border: 1px solid #52DEFFA0;
 }
 </style>
