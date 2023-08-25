@@ -11,7 +11,6 @@ import router from './router';
 import store from './store';
 
 import 'element-ui/lib/theme-chalk/index.css';
-import 'buefy/dist/buefy.css';
 import './assets/css/all.css';
 
 Vue.use(Element)

@@ -7,6 +7,7 @@
     <div v-else class="no-show" />
 
     <b-modal v-model="isShow"
+             :canCancel="false"
              has-modal-card
              trap-focus>
       <SessionCard/>
@@ -15,7 +16,7 @@
 </template>
 
 <script>
-import {queryBalance} from "@/utils/Session";
+import {queryBalance} from "@/utils/Particle";
 import BigNumber from 'bignumber.js';
 import SessionCard from './SessionCard';
 
@@ -57,7 +58,7 @@ export default {
       if (this.loadInterval) {
         clearInterval(this.loadInterval);
       }
-      this.loopQueryBalance();
+      setTimeout(this.loopQueryBalance, 1000);
       this.loadInterval = setInterval(this.loopQueryBalance, 15000,);
     },
     async loopQueryBalance() {
