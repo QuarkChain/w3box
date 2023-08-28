@@ -58,8 +58,8 @@ export default {
       if (this.loadInterval) {
         clearInterval(this.loadInterval);
       }
-      setTimeout(this.loopQueryBalance, 1000);
-      this.loadInterval = setInterval(this.loopQueryBalance, 15000,);
+      setTimeout(this.loopQueryBalance, 2000);
+      this.loadInterval = setInterval(this.loopQueryBalance, 30000,);
     },
     async loopQueryBalance() {
       if (this.aaAddress) {

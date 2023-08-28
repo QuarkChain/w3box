@@ -1,24 +1,9 @@
 import { ethers } from "ethers";
+import {queryBalance} from "@/utils/Particle";
+import {FileContract} from "@/utils/contract";
 const sha3 = require('js-sha3').keccak_256;
 
-const FileContractInfo = {
-  abi: [
-    "function writeChunk(bytes memory name, bytes memory fileType, uint256 chunkId, bytes calldata data) public payable",
-    "function remove(bytes memory name) external returns (uint256)",
-    "function removes(bytes[] memory names) public",
-    "function countChunks(bytes memory name) external view returns (uint256)",
-    "function getChunkHash(bytes memory name, uint256 chunkId) public view returns (bytes32)",
-    "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types,string[] memory urls)"
-  ],
-};
-
 const stringToHex = (s) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(s));
-
-const FileContract = async (address) => {
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const contract = new ethers.Contract(address, FileContractInfo.abi, provider);
-  return contract.connect(provider.getSigner());
-};
 
 const readFile = (file) => {
   return new Promise((resolve) => {
@@ -105,13 +90,14 @@ export const request = async ({
     }
 
     try {
-      // const balance = await fileContract.provider.getBalance(account);
+      const balance = await queryBalance(account);
       // if(balance.lte(ethers.utils.parseEther(cost.toString()))){
-      //   // not enough balance
-      //   uploadState = false;
-      //   notEnoughBalance = true;
-      //   break;
-      // }
+      if(balance.lte(ethers.utils.parseEther(1))){
+        // not enough balance
+        uploadState = false;
+        notEnoughBalance = true;
+        break;
+      }
 
       // file is remove or change
       console.log(hexName, hexType, index);

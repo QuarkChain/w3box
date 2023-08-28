@@ -1,6 +1,7 @@
 import { SmartAccount } from '@particle-network/aa';
 import { chain } from "@/components/Wallet";
 import { ethers } from "ethers";
+import {FileContract} from "@/utils/contract";
 
 const project_id = '1dfb2c01-d88d-436a-b7cb-caf8e7bfc931';
 const client_key = 'czEvMjfwi6s7dKONW2THRhYSGCl8gu5TUxUxWase';
@@ -18,6 +19,26 @@ export const getAddress = async () => {
     });
     console.log(smartAccount, await smartAccount.getAddress())
     return await smartAccount.getAddress();
+}
+
+export const isCreate = async (contractAddress, account) => {
+    const contract = FileContract(contractAddress);
+    const aaAccount = await contract.aaMap(account);
+    return aaAccount !== '0x0000000000000000000000000000000000000000';
+}
+
+export const createAA = async (contractAddress, aaAccount, account) => {
+    const hashedMessage = ethers.utils.keccak256(aaAccount);
+    // sign hashed message
+    const signature = await window.ethereum.request({
+        method: "personal_sign",
+        params: [hashedMessage, account],
+    });
+    const r = signature.slice(0, 66);
+    const s = "0x" + signature.slice(66, 130);
+    const v = parseInt(signature.slice(130, 132), 16);
+    console.log({ r, s, v });
+
 }
 
 export const queryBalance = async (sessionAddress) => {

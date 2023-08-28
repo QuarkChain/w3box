@@ -2,8 +2,8 @@ import {ethers} from "ethers";
 
 const FileContractInfo = {
     abi: [
-        "function createSession(address addr, bytes memory iv, bytes memory encrypt) public",
-        "function getSession() public view returns (address addr, bytes memory iv, bytes memory encrypt)",
+        "function setAAAccountByAA(address account, uint8 v, bytes32 r, bytes32 s) public",
+        "function aaMap(address author) external view returns (address)",
 
         "function writeChunk(address author, bytes memory name, bytes memory fileType, uint256 chunkId, bytes calldata data) public payable",
         "function remove(address author, bytes memory name) external returns (uint256)",

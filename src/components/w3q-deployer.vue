@@ -30,11 +30,15 @@ export default {
   name: 'w3q-deployer',
   components: { UploadDragger, UploadList },
   props: {
+    fileContract: {
+      type: String,
+      default: ""
+    },
     account: {
       type: String,
       default: ""
     },
-    fileContract: {
+    aaAccount: {
       type: String,
       default: ""
     },
@@ -72,7 +76,7 @@ export default {
   },
   computed: {
     enable() {
-      return this.fileContract !== null;
+      return this.aaAccount !== null;
     },
     chunkLength() {
       return 24 * 1024 - 326;

@@ -60,7 +60,7 @@ export default {
     this.loopQueryBalance();
   },
   methods: {
-    ...mapActions(["setChainConfig", "setAccount", "setAAAddress"]),
+    ...mapActions(["setAccount", "setAAAddress"]),
     parseFixed(value) {
       if (isNaN(value)) {
         value = 0;
@@ -108,7 +108,6 @@ export default {
       });
     },
     onDisconnct() {
-      this.setChainConfig(null);
       this.setAccount(null);
       this.setAAAddress(null);
       this.$parent.close();

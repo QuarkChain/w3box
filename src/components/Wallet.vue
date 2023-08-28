@@ -89,6 +89,8 @@ export default {
     async handleAccountsChanged(accounts) {
       if (accounts[0] !== this.currentAccount) {
         this.setAAAddress(null);
+        this.setAccount(null);
+        this.currentAccount = null;
       } else {
         const address = await getAddress();
         this.setAAAddress(address);
