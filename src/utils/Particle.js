@@ -8,8 +8,8 @@ const client_key = 'czEvMjfwi6s7dKONW2THRhYSGCl8gu5TUxUxWase';
 const app_id = '1be21ef9-fb2e-4642-8fde-b278c88b697b';
 const biconomy_api_key = '14QZAXT16.bfe830fc-7672-42db-9614-e4fec87ac902';
 
-export const getAddress = async () => {
-    const smartAccount = new SmartAccount(window.ethereum, {
+export const getAAAccount = () => {
+    return new SmartAccount(window.ethereum, {
         projectId: project_id,
         clientKey: client_key,
         appId: app_id,
@@ -17,7 +17,10 @@ export const getAddress = async () => {
             {dappAPIKey: biconomy_api_key, chainId: chain}
         ],
     });
-    console.log(smartAccount, await smartAccount.getAddress())
+}
+
+export const getAddress = async () => {
+    const smartAccount = getAAAccount();
     return await smartAccount.getAddress();
 }
 
@@ -37,8 +40,16 @@ export const createAA = async (contractAddress, aaAccount, account) => {
     const r = signature.slice(0, 66);
     const s = "0x" + signature.slice(66, 130);
     const v = parseInt(signature.slice(130, 132), 16);
-    console.log({ r, s, v });
 
+    const fileContract = FileContract(contractAddress);
+    const populateTx = await fileContract.populateTransaction.setAAAccountByAA(account, v, r, s);
+    const tx = {
+        to: populateTx.to,
+        data: populateTx.data,
+    }
+    const hash = await sendTx(tx);
+    const receipt = await getTxReceipt(hash);
+    return receipt.status;
 }
 
 export const queryBalance = async (sessionAddress) => {
@@ -58,4 +69,54 @@ export const transferGas = async (amount, to) => {
     const tx = await signer.sendTransaction(transaction);
     const receipt = await tx.wait();
     return receipt.status;
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
+async function isTransactionMined(provider, transactionHash) {
+    const txReceipt = await provider.getTransactionReceipt(transactionHash);
+    if (txReceipt && txReceipt.blockNumber) {
+        return txReceipt;
+    }
+}
+
+export const getTxReceipt = async (transactionHash) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    let txReceipt;
+    while (!txReceipt) {
+        txReceipt = await isTransactionMined(provider, transactionHash);
+        if (txReceipt) {
+            break;
+        }
+        await sleep(5000);
+    }
+    return txReceipt;
+}
+
+export const sendTx = async (tx) => {
+    const smartAccount = getAAAccount();
+    return await sendTxByAccount(smartAccount, tx);
+}
+
+export const sendTxByAccount = async (smartAccount, tx) => {
+    //get fee quotes with tx or txs
+    const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
+
+    // pay with Native tokens
+    const paidNativeUserOp = feeQuotesResult.verifyingPaymasterNative?.userOp;
+    const paidNativeUserOpHash = feeQuotesResult.verifyingPaymasterNative?.userOpHash;
+    // // gasless transaction userOp, maybe null
+    // const gaslessUserOp = feeQuotesResult.verifyingPaymasterGasless?.userOp;
+    // const gaslessUserOpHash = feeQuotesResult.verifyingPaymasterGasless?.userOpHash;
+
+    const txHash = await smartAccount.sendUserOperation({
+        userOp: paidNativeUserOp,
+        userOpHash: paidNativeUserOpHash
+    });
+    console.log('txHash', txHash);
+    return txHash;
 }

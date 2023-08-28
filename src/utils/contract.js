@@ -11,7 +11,6 @@ const FileContractInfo = {
         "function countChunks(address author, bytes memory name) external view returns (uint256)",
         "function getChunkHash(address author, bytes memory name, uint256 chunkId) public view returns (bytes32)",
         "function getAuthorFiles(address author) public view returns (uint256[] memory times,bytes[] memory names,bytes[] memory types,string[] memory urls)",
-        "function getSession() public view returns (address addr, bytes memory iv, bytes memory encrypt) "
     ],
 };
 

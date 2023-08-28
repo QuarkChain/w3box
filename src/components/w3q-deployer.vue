@@ -20,6 +20,7 @@
 import {NotEnoughBalance, request} from '@/utils/request';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
+import EventBus from "@/utils/eventBus";
 const copy = require('clipboard-copy')
 
 const sha3 = require('js-sha3').keccak_256;
@@ -195,9 +196,16 @@ export default {
       file.status = 'failure';
       this.onError(error, file, this.files);
       if (error instanceof NotEnoughBalance) {
-        this.$notify.error({
-          title: 'Not enough balance!',
-          message: 'File >=24kb requires staking token.'
+        this.$confirm('The balance of the AA account is not enough to pay the gas fee, do you need to transfer the gas fee to it?',
+          'Not enough balance!',
+          {
+            confirmButtonText: 'Ok',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }
+        ).then(() => {
+          EventBus.$emit('show', true);
+        }).catch(() => {
         });
       }
     },

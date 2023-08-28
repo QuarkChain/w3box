@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
-import {queryBalance} from "@/utils/Particle";
-import {FileContract} from "@/utils/contract";
+import { getAAAccount, getTxReceipt, sendTxByAccount} from "@/utils/Particle";
+import { FileContract } from "@/utils/contract";
+import BigNumber from "bignumber.js";
 const sha3 = require('js-sha3').keccak_256;
 
 const stringToHex = (s) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(s));
@@ -26,15 +27,16 @@ const bufferChunk = (buffer, chunkSize) => {
   return result;
 }
 
-const clearOldFile = async (fileContract, chunkSize, hexName) => {
+const clearOldFile = async (fileContract, smartAccount, account, chunkSize, hexName) => {
   try {
-    const oldChunkSize = await fileContract.countChunks(hexName);
+    const oldChunkSize = await fileContract.countChunks(account, hexName);
     if (oldChunkSize > chunkSize) {
       // remove
-      const tx = await fileContract.remove(hexName);
+      const populateTx = await fileContract.populateTransaction.remove(account, hexName);
+      const hash = await sendTxByAccount(smartAccount, populateTx);
       console.log(`Remove file: ${hexName}`);
-      console.log(`Transaction Id: ${tx.hash}`);
-      const receipt = await tx.wait();
+      console.log(`Transaction Id: ${hash}`);
+      const receipt = await getTxReceipt(hash);
       return receipt.status;
     }
   } catch (e) {
@@ -70,7 +72,8 @@ export const request = async ({
   }
 
   const fileContract = await FileContract(contractAddress);
-  const clear = await clearOldFile(fileContract, chunks.length, hexName, hexType)
+  const smartAccount = getAAAccount();
+  const clear = await clearOldFile(fileContract, smartAccount, account, chunks.length, hexName, hexType)
   if (!clear) {
     onError(new Error("Check Old File Fail!"));
     return;
@@ -82,7 +85,7 @@ export const request = async ({
     const chunk = chunks[index];
     const hexData = '0x' + chunk.toString('hex');
     const localHash = '0x' + sha3(chunk);
-    const hash = await fileContract.getChunkHash(hexName, index);
+    const hash = await fileContract.getChunkHash(account, hexName, index);
     if (localHash === hash) {
       console.log(`File ${name} chunkId: ${index}: The data is not changed.`);
       onProgress({ percent: Number(index) + 1});
@@ -90,20 +93,23 @@ export const request = async ({
     }
 
     try {
-      const balance = await queryBalance(account);
-      // if(balance.lte(ethers.utils.parseEther(cost.toString()))){
-      if(balance.lte(ethers.utils.parseEther(1))){
+      // file is remove or change
+      const populateTx = await fileContract.populateTransaction.writeChunk(account, hexName, hexType, index, hexData);
+      // TODO
+      const feeQuotesResult = await smartAccount.getFeeQuotes(populateTx);
+      const balance = feeQuotesResult.verifyingPaymasterNative.feeQuote.balance;
+      const cost = feeQuotesResult.verifyingPaymasterNative.feeQuote.fee;
+      console.log(balance, cost);
+      if(new BigNumber(balance).lt(new BigNumber(cost))){
         // not enough balance
         uploadState = false;
         notEnoughBalance = true;
         break;
       }
 
-      // file is remove or change
-      console.log(hexName, hexType, index);
-      const tx = await fileContract.writeChunk(hexName, hexType, index, hexData);
-      console.log(`Transaction Id: ${tx.hash}`);
-      const receipt = await tx.wait();
+      const hash = await sendTxByAccount(smartAccount, populateTx);
+      console.log(`Transaction Id: ${hash}`);
+      const receipt = await getTxReceipt(hash);
       if (!receipt.status) {
         uploadState = false;
         break;

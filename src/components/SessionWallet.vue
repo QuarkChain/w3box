@@ -19,6 +19,7 @@
 import {queryBalance} from "@/utils/Particle";
 import BigNumber from 'bignumber.js';
 import SessionCard from './SessionCard';
+import EventBus from '@/utils/eventBus';
 
 export default {
   name: "SessionComponent",
@@ -44,6 +45,9 @@ export default {
   },
   async created() {
     this.initData();
+    EventBus.$on('show', value => {
+      this.isShow = value;
+    });
   },
   methods: {
     parseFixed(value) {
