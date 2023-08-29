@@ -5,22 +5,30 @@
       v-if="!this.account"
       @click.stop="connectWallet"
     >
-      Connect
+      Login
     </button>
-    <div v-else class="user">
+    <div v-else class="user" @click="onOpenCreate">
       <div class="metamask">
         <div class="metamask-img" />
         <div class="account">{{ this.accountShort }}</div>
       </div>
       <div class="favorite" @click.stop="goProfile"/>
     </div>
+
+    <b-modal v-model="isShow"
+             :canCancel="false"
+             has-modal-card
+             trap-focus>
+      <WalletCard/>
+    </b-modal>
   </div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
 import { chains } from '@/store/state';
-import { getAddress } from "@/utils/Particle";
+import { getAddress, isCreate } from "@/utils/Particle";
+import WalletCard from './WalletCard.vue';
 
 export class UnsupportedChainIdError extends Error {
   constructor() {
@@ -35,14 +43,12 @@ const explorers = ['https://mumbai.polygonscan.com'];
 
 export default {
   name: "WalletComponent",
-  async created() {
-    const c = chains.find((v) => v.chainID === chainID);
-    const config = JSON.parse(JSON.stringify(c));
-    this.setChainConfig(config);
-
-    this.connectWallet();
-    window.ethereum.on("chainChanged", this.handleChainChanged);
-    window.ethereum.on("accountsChanged", this.handleAccountsChanged);
+  data: () => ({
+    isShow: false,
+    contract: '',
+  }),
+  components: {
+    WalletCard
   },
   computed: {
     account() {
@@ -50,19 +56,22 @@ export default {
     },
     accountShort() {
       return (
-        this.account.substring(0, 6) +
-        "..." +
-        this.account.substring(
-          this.account.length - 4,
-          this.account.length
-        )
+          this.account.substring(0, 6) +
+          "..." +
+          this.account.substring(
+              this.account.length - 4,
+              this.account.length
+          )
       );
     },
   },
   methods: {
     ...mapActions(["setChainConfig", "setAccount", "setAAAddress"]),
-    goProfile(){
+    goProfile() {
       this.$router.push({path: "/address/" + this.account});
+    },
+    onOpenCreate() {
+      this.isShow = true;
     },
     connectWallet() {
       if (!window.ethereum) {
@@ -102,7 +111,7 @@ export default {
     },
     async login() {
       window.ethereum
-          .request({ method: "eth_requestAccounts" })
+          .request({method: "eth_requestAccounts"})
           .then(this.handleAccounts)
           .catch(async (error) => {
             if (error.code === 4001) {
@@ -154,9 +163,26 @@ export default {
     },
 
     async initAAInfo() {
-      const address = await getAddress();
-      this.setAAAddress(address);
+      const created = await isCreate(this.contract, this.account);
+      if (created) {
+        // is created AA
+        const address = await getAddress();
+        this.setAAAddress(address);
+      } else {
+        // first use DApp, need create AA wallet
+        this.isShow = true;
+      }
     },
+  },
+  async created() {
+    const c = chains.find((v) => v.chainID === chainID);
+    const config = JSON.parse(JSON.stringify(c));
+    this.setChainConfig(config);
+    this.contract = config.FileBoxController;
+
+    // this.connectWallet();
+    window.ethereum.on("chainChanged", this.handleChainChanged);
+    window.ethereum.on("accountsChanged", this.handleAccountsChanged);
   },
 };
 </script>
@@ -170,6 +196,7 @@ export default {
 .user{
   display: flex;
   flex-direction: row;
+  cursor: pointer;
 }
 
 .metamask {
@@ -215,13 +242,13 @@ export default {
 
 .btn-connect {
   transition: all 0.1s ease 0s;
-  width: 120px;
-  height: 44px;
+  width: 100px;
+  height: 38px;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 19px;
   border: 0;
   background: #52DEFF;
-  border-radius: 36px;
+  border-radius: 32px;
   cursor: pointer;
 }
 .btn-connect:hover {

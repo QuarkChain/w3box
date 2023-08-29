@@ -31,25 +31,29 @@ export const isCreate = async (contractAddress, account) => {
 }
 
 export const createAA = async (contractAddress, aaAccount, account) => {
-    const hashedMessage = ethers.utils.keccak256(aaAccount);
-    // sign hashed message
-    const signature = await window.ethereum.request({
-        method: "personal_sign",
-        params: [hashedMessage, account],
-    });
-    const r = signature.slice(0, 66);
-    const s = "0x" + signature.slice(66, 130);
-    const v = parseInt(signature.slice(130, 132), 16);
+    try {
+        const hashedMessage = ethers.utils.keccak256(aaAccount);
+        // sign hashed message
+        const signature = await window.ethereum.request({
+            method: "personal_sign",
+            params: [hashedMessage, account],
+        });
+        const r = signature.slice(0, 66);
+        const s = "0x" + signature.slice(66, 130);
+        const v = parseInt(signature.slice(130, 132), 16);
 
-    const fileContract = FileContract(contractAddress);
-    const populateTx = await fileContract.populateTransaction.setAAAccountByAA(account, v, r, s);
-    const tx = {
-        to: populateTx.to,
-        data: populateTx.data,
+        const fileContract = FileContract(contractAddress);
+        const populateTx = await fileContract.populateTransaction.setAAAccountByAA(account, v, r, s);
+        const tx = {
+            to: populateTx.to,
+            data: populateTx.data,
+        }
+        const hash = await sendTx(tx);
+        const receipt = await getTxReceipt(hash);
+        return receipt.status;
+    } catch (e) {
+        return undefined;
     }
-    const hash = await sendTx(tx);
-    const receipt = await getTxReceipt(hash);
-    return receipt.status;
 }
 
 export const queryBalance = async (sessionAddress) => {

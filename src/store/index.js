@@ -5,8 +5,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     chainConfig: {},
-    account: '',
-    aaAddress: '',
+    account: null,
+    aaAddress: null,
   },
   mutations: {
     chainMutation: (state, payload) => state.chainConfig = payload,
