@@ -1,4 +1,6 @@
 import { FileContract } from "./contract";
+import BigNumber from "bignumber.js";
+import {getAAAccount, getTxReceipt, sendTxByAccount} from "@/utils/Particle";
 
 // contract
 export const getUploadByAddress = async (controller, address) => {
@@ -25,16 +27,30 @@ export const getUploadByAddress = async (controller, address) => {
     return files;
 }
 
-export const deleteFile = async (controller, file) => {
+export const deleteFile = async (controller, account, file) => {
     const fileContract = FileContract(controller);
-    const tx = await fileContract.remove(file);
-    const receipt = await tx.wait();
-    return receipt.status;
+    const tx = await fileContract.populateTransaction.remove(account, file);
+    return send(tx);
 }
 
-export const deleteFiles = async (controller, files) => {
+export const deleteFiles = async (controller, account, files) => {
     const fileContract = FileContract(controller);
-    const tx = await fileContract.removes(files);
-    const receipt = await tx.wait();
+    const tx = await fileContract.populateTransaction.removes(account, files);
+    return send(tx);
+}
+
+async function send(tx) {
+    const smartAccount = getAAAccount();
+    const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
+    const balance = feeQuotesResult.verifyingPaymasterNative.feeQuote.balance;
+    const cost = feeQuotesResult.verifyingPaymasterNative.feeQuote.fee;
+    if(new BigNumber(balance).lt(new BigNumber(cost))){
+        // not enough balance
+        return 400;
+    }
+
+    const hash = await sendTxByAccount(smartAccount, tx);
+    console.log(`Transaction Id: ${hash}`);
+    const receipt = await getTxReceipt(hash);
     return receipt.status;
 }

@@ -63,6 +63,7 @@
 import {ethers} from "ethers";
 import UpdateIcon from "../components/icon";
 import {getUploadByAddress, deleteFile, deleteFiles} from '@/utils/profile';
+import EventBus from "@/utils/eventBus";
 
 const copy = require('clipboard-copy')
 const hexToString = (h) => ethers.utils.toUtf8String(h);
@@ -79,14 +80,19 @@ export default {
   },
   components: { UpdateIcon },
   computed: {
-    chainConfig() {
-      return this.$store.state.chainConfig;
+    account() {
+      return this.$store.state.account;
+    },
+    aaAddress() {
+      return this.$store.state.aaAddress;
     },
   },
   watch: {
-    chainConfig: function () {
-      if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
+    aaAddress: function () {
+      if (this.$store.state.aaAddress) {
         this.onSearch();
+      } else {
+        this.result = [];
       }
     }
   },
@@ -111,10 +117,11 @@ export default {
       this.$router.push({path: "/"});
     },
     onSearch() {
-      const { FileBoxController} = this.$store.state.chainConfig;
-      if (!FileBoxController) {
+      if (!this.aaAddress) {
+        this.result = [];
         return;
       }
+      const { FileBoxController} = this.$store.state.chainConfig;
       getUploadByAddress(FileBoxController, this.$route.params.address)
           .then(value => {
             this.result = value;
@@ -137,9 +144,23 @@ export default {
         return;
       }
       item.showProgress = true;
-      deleteFile(FileBoxController, item.name)
+      deleteFile(FileBoxController, this.account, item.name)
           .then((v) => {
             if (v) {
+              if(v === 400){
+                this.$confirm('The balance of the AA account is not enough to pay the gas fee, do you need to transfer the gas fee to it?',
+                    'Not enough balance!',
+                    {
+                      confirmButtonText: 'Ok',
+                      cancelButtonText: 'Cancel',
+                      type: 'warning'
+                    }
+                ).then(() => {
+                  EventBus.$emit('show', true);
+                }).catch(() => {});
+                return;
+              }
+
               this.result = this.result.filter(value => item !== value);
               this.$notify({
                 title: 'Success',
@@ -182,9 +203,23 @@ export default {
           item.showProgress = true;
           names.push(item.name);
         }
-        deleteFiles(FileBoxController, names)
+        deleteFiles(FileBoxController, this.account, names)
             .then((v) => {
               if (v) {
+                if(v === 400){
+                  this.$confirm('The balance of the AA account is not enough to pay the gas fee, do you need to transfer the gas fee to it?',
+                      'Not enough balance!',
+                      {
+                        confirmButtonText: 'Ok',
+                        cancelButtonText: 'Cancel',
+                        type: 'warning'
+                      }
+                  ).then(() => {
+                    EventBus.$emit('show', true);
+                  }).catch(() => {});
+                  return;
+                }
+
                 for(const item of this.checkedDeletes) {
                   this.result = this.result.filter(value => item !== value);
                 }
