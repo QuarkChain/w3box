@@ -8,6 +8,7 @@
       </p>
       <w3q-deployer multiple
                     :fileContract="contract"
+                    :fdContract="fdContract"
                     :account="account"
                     :aaAccount="aaAccount"
                     class="drop"/>
@@ -26,6 +27,13 @@ export default {
       if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
         const {FileBoxController} = this.$store.state.chainConfig;
         return FileBoxController;
+      }
+      return null;
+    },
+    fdContract() {
+      if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
+        const {FDContract} = this.$store.state.chainConfig;
+        return FDContract;
       }
       return null;
     },

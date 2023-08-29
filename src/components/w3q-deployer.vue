@@ -35,6 +35,10 @@ export default {
       type: String,
       default: ""
     },
+    fdContract: {
+      type: String,
+      default: ""
+    },
     account: {
       type: String,
       default: ""
@@ -155,6 +159,7 @@ export default {
         chunkLength: this.chunkLength,
         account: this.account,
         contractAddress: this.fileContract,
+        fdContract: this.fdContract,
         dirPath: this.dirPath,
         file: file,
         onSuccess: this.handleSuccess.bind(this, file),

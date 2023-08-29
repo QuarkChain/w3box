@@ -49,6 +49,7 @@ export const request = async ({
   chunkLength,
   account,
   contractAddress,
+  fdContract,
   dirPath,
   file,
   onSuccess,
@@ -120,7 +121,7 @@ export const request = async ({
     }
   }
   if (uploadState) {
-    const url = "https://file.w3q.arb-goerli.w3link.io/" + account + "/" + name;
+    const url = "https://" +  fdContract + ".maticmum.w3link.io/" + account + "/" + name;
     onSuccess({ path: url});
   } else {
     if (notEnoughBalance) {
