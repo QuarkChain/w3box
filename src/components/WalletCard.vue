@@ -246,4 +246,15 @@ export default {
   font-size: 25px;
   color: #52DEFF;
 }
+
+@media screen and (max-width: 500px) {
+  .dialog_card {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .deploy-icon {
+    font-size: 50px;
+  }
+}
 </style>

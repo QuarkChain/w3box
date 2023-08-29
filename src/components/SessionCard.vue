@@ -231,4 +231,20 @@ export default {
   background: #52DEFFA0;
   border: 1px solid #52DEFFA0;
 }
+
+@media screen and (max-width: 500px) {
+  .dialog_card {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .wallet-title2 {
+    margin-top: 60px;
+  }
+
+  .records-btn {
+    font-size: 16px;
+    width: 110px;
+  }
+}
 </style>

@@ -7,8 +7,8 @@
     >
       Login
     </button>
-    <div v-else class="user" @click="onOpenCreate">
-      <div class="metamask">
+    <div v-else class="user">
+      <div class="metamask" @click.stop="onOpenCreate">
         <div class="metamask-img" />
         <div class="account">{{ this.accountShort }}</div>
       </div>
@@ -196,7 +196,6 @@ export default {
 .user{
   display: flex;
   flex-direction: row;
-  cursor: pointer;
 }
 
 .metamask {
@@ -208,6 +207,7 @@ export default {
   padding: 4px 4px 4px 8px;
   background: #FFFFFF;
   border: 1px solid #E8E6F2;
+  cursor: pointer;
 }
 .metamask-img {
   width: 24px;
