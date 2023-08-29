@@ -20,7 +20,7 @@
     <div class="gas-title">Transfer Gas</div>
     <div class="wallet-top-item gas-layout">
       <el-input class="item-input" placeholder="0.00 ETH" @input="didInputStakeAmount" v-model="input" />
-      <el-button type="warning" round class="records-btn" @click="onTransfer">
+      <el-button type="warning" round class="records-btn" :loading='progress' @click="onTransfer">
         Transfer
       </el-button>
     </div>
@@ -39,6 +39,7 @@ export default {
   data: () => ({
     balance: '0.000',
     input: '',
+    progress: false,
   }),
   computed: {
     aaAddress() {
@@ -119,9 +120,11 @@ export default {
         return;
       }
 
+      this.progress = true;
       const result = await transferGas(amount, this.aaAddress);
       if(result) {
         await this.loopQueryBalance();
+        this.progress = false;
         this.$notify({
           title: 'Success',
           message: 'Transfer Success',

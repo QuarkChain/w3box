@@ -35,12 +35,6 @@ const explorers = ['https://mumbai.polygonscan.com'];
 
 export default {
   name: "WalletComponent",
-  props: {},
-
-  data: () => ({
-    networkId: chain,
-    currentAccount: null,
-  }),
   async created() {
     const c = chains.find((v) => v.chainID === chainID);
     const config = JSON.parse(JSON.stringify(c));
@@ -51,24 +45,24 @@ export default {
     window.ethereum.on("accountsChanged", this.handleAccountsChanged);
   },
   computed: {
-    accountShort() {
-      return (
-        this.currentAccount.substring(0, 6) +
-        "..." +
-        this.currentAccount.substring(
-          this.currentAccount.length - 4,
-          this.currentAccount.length
-        )
-      );
-    },
     account() {
       return this.$store.state.account;
+    },
+    accountShort() {
+      return (
+        this.account.substring(0, 6) +
+        "..." +
+        this.account.substring(
+          this.account.length - 4,
+          this.account.length
+        )
+      );
     },
   },
   methods: {
     ...mapActions(["setChainConfig", "setAccount", "setAAAddress"]),
     goProfile(){
-      this.$router.push({path: "/address/" + this.currentAccount});
+      this.$router.push({path: "/address/" + this.account});
     },
     connectWallet() {
       if (!window.ethereum) {
@@ -81,24 +75,15 @@ export default {
       const newChainId = await window.ethereum.request({method: "eth_chainId"});
       if (chainID !== newChainId) {
         this.setAAAddress(null);
-      } else if (this.currentAccount) {
-        const address = await getAddress();
-        this.setAAAddress(address);
+        this.setAccount(null);
       }
     },
-    async handleAccountsChanged(accounts) {
-      if (accounts[0] !== this.currentAccount) {
-        this.setAAAddress(null);
-        this.setAccount(null);
-        this.currentAccount = null;
-      } else {
-        const address = await getAddress();
-        this.setAAAddress(address);
-      }
+    async handleAccountsChanged() {
+      this.setAAAddress(null);
+      this.setAccount(null);
     },
     async handleAccounts(accounts) {
       if (accounts.length === 0) {
-        this.currentAccount = null;
         this.setAccount(null);
         this.setAAAddress(null);
         console.warn(
@@ -112,7 +97,6 @@ export default {
         throw new UnsupportedChainIdError();
       }
 
-      this.currentAccount = accounts[0];
       this.setAccount(accounts[0]);
       await this.initAAInfo();
     },

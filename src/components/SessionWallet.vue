@@ -1,10 +1,9 @@
 <template>
   <div id="session">
-    <div v-if="this.aaAddress" class="wallet" @click="openDialog">
+    <div class="wallet" @click="openDialog">
       <div class="wallet-img"/>
       <p class="balance">{{ this.balance }} ETH</p>
     </div>
-    <div v-else class="no-show" />
 
     <b-modal v-model="isShow"
              :canCancel="false"
@@ -62,8 +61,8 @@ export default {
       if (this.loadInterval) {
         clearInterval(this.loadInterval);
       }
-      setTimeout(this.loopQueryBalance, 2000);
-      this.loadInterval = setInterval(this.loopQueryBalance, 30000,);
+      setTimeout(this.loopQueryBalance, 1500);
+      this.loadInterval = setInterval(this.loopQueryBalance, 20000,);
     },
     async loopQueryBalance() {
       if (this.aaAddress) {

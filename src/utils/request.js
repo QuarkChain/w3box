@@ -95,11 +95,9 @@ export const request = async ({
     try {
       // file is remove or change
       const populateTx = await fileContract.populateTransaction.writeChunk(account, hexName, hexType, index, hexData);
-      // TODO
       const feeQuotesResult = await smartAccount.getFeeQuotes(populateTx);
       const balance = feeQuotesResult.verifyingPaymasterNative.feeQuote.balance;
       const cost = feeQuotesResult.verifyingPaymasterNative.feeQuote.fee;
-      console.log(balance, cost);
       if(new BigNumber(balance).lt(new BigNumber(cost))){
         // not enough balance
         uploadState = false;
