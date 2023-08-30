@@ -1,8 +1,11 @@
 <template>
-  <div id="session">
-    <div class="wallet" @click="openDialog">
-      <div class="wallet-img"/>
-      <p class="balance">{{ this.balance }} ETH</p>
+  <div id="wallet">
+    <div class="user">
+      <div class="wallet" @click.stop="openDialog">
+        <div class="wallet-img"/>
+        <div class="balance">{{ this.balance }} ETH</div>
+      </div>
+      <div class="favorite" />
     </div>
 
     <b-modal v-model="isShow"
@@ -79,9 +82,14 @@ export default {
 </script>
 
 <style scoped>
-#session {
+#wallet {
   display: flex;
   justify-content: center;
+}
+
+.user{
+  display: flex;
+  flex-direction: row;
 }
 
 .wallet {
