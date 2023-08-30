@@ -122,9 +122,9 @@ export default {
 
       this.progress = true;
       const result = await transferGas(amount, this.aaAddress);
+      this.progress = false;
       if(result) {
         await this.loopQueryBalance();
-        this.progress = false;
         this.$notify({
           title: 'Success',
           message: 'Transfer Success',

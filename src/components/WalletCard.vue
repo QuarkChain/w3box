@@ -112,8 +112,8 @@ export default {
 
       this.gasLoading = true;
       const result = await transferGas(amount, this.aaAddress);
+      this.gasLoading = false;
       if (result) {
-        this.gasLoading = false;
         this.isDisabledCreate = false;
         this.$notify({
           title: 'Success',
@@ -255,6 +255,11 @@ export default {
 
   .deploy-icon {
     font-size: 50px;
+  }
+
+  .records-btn {
+    font-size: 16px;
+    width: 110px;
   }
 }
 </style>
