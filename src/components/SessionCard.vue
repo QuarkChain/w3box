@@ -217,14 +217,14 @@ export default {
   align-items: center;
 }
 .item-input {
-  width: 60%;
+  width: 55%;
 }
 
 .records-btn {
   background: #52DEFF;
   border: 1px solid #52DEFF;
   font-size: 17px;
-  width: 110px;
+  width: 120px;
 }
 .records-btn:focus,
 .records-btn:hover {

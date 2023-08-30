@@ -208,7 +208,7 @@ export default {
   justify-content: space-between;
 }
 .item-input {
-  width: 60%;
+  width: 55%;
 }
 .records-btn {
   background: #52DEFF;
