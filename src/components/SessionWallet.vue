@@ -85,31 +85,18 @@ export default {
 }
 
 .wallet {
-  position: relative;
   height: 38px;
   border-radius: 14px;
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 4px 8px 4px 4px;
-  background: #FFFFFF;
-  background-clip: padding-box; /*important*/
   border: 1px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image: linear-gradient(to right, #fff, #fff), linear-gradient(to right, #8F41E9, #578AEF);;
   cursor: pointer;
 }
-.wallet::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  z-index: -1;
-  margin: -1px;
-  border-radius: inherit; /*important*/
-  background: linear-gradient(to right, #8F41E9, #578AEF);
-}
-
 .wallet-img {
   width: 24px;
   height: 20px;
@@ -123,10 +110,5 @@ export default {
   line-height: 30px;
   text-align: center;
   margin-left: 4px;
-}
-
-
-.no-show {
-  display: none;
 }
 </style>
