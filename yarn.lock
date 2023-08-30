@@ -5182,10 +5182,10 @@ ethers@^5.6.5, ethers@^5.7.0:
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
 
-ethfs-uploader@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/ethfs-uploader/-/ethfs-uploader-1.0.0.tgz#82a743cf37d207f1c29ab9f42b3fd8ef3de885ed"
-  integrity sha512-8zSkuAM8YLmr9wf6ApNtN8SUCcJVYOUE3fU829rxy+r8ndLK3t6U7bfR7cZwMm5NbV1ONv2MjIlbHyy7AIWOhg==
+ethfs-uploader@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/ethfs-uploader/-/ethfs-uploader-1.2.0.tgz#3e9c58053213be1d2b8e1aec422137d0af864271"
+  integrity sha512-oc7TwCyTMrl4gyLlQMQW85xMh86KHVA/MFWd1NBfUq9oqcg34650J9RqEfq2H1Q+GMORFcV6jZGPmaZju+pleA==
   dependencies:
     colors-cli "^1.0.28"
     eth-ens-namehash "^2.0.8"
