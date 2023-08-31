@@ -6,28 +6,36 @@
     </div>
 
     <div class="dialog-msg">
-      W3Box uses AA account for file upload, an ERC-4337 compatible smart contract account fully controlled by your current connected address.
+      W3Box utilizes an AA account to upload files—an ERC-4337 compatible smart contract account that is fully
+      controlled by your currently connected address. Meanwhile, W3Box also takes advantage of the <span
+        style="color:red">gasless</span> feature
+      provided by AA.
     </div>
 
     <div v-if="!this.created">
-      <el-card class="wallet-card">
-        <div class="gas-title">1. Top up Gas Credit</div>
-        <div class="wallet-top-item gas-layout">
-          <el-input class="item-input" placeholder=">= 0.01 ETH" @input="didInputStakeAmount" v-model="input"/>
-          <el-button type="warning" round class="records-btn"
-                     :loading='gasLoading' @click="onTransfer">
-            Transfer
-          </el-button>
-        </div>
-      </el-card>
-      <el-card class="wallet-card">
-        <div class="gas-title">2. Deploy AA Account</div>
-        <el-button type="warning" round class="records-btn create-aa"
-                   :disabled="isDisabledCreate"
-                   :loading='createLoading' @click="onDeploy">
-          Deploy
-        </el-button>
-      </el-card>
+<!--      <el-card class="wallet-card">-->
+<!--        <div class="gas-title">1. Top up Gas Credit</div>-->
+<!--        <div class="wallet-top-item gas-layout">-->
+<!--          <el-input class="item-input" placeholder=">= 0.01 ETH" @input="didInputStakeAmount" v-model="input"/>-->
+<!--          <el-button type="warning" round class="records-btn"-->
+<!--                     :loading='gasLoading' @click="onTransfer">-->
+<!--            Transfer-->
+<!--          </el-button>-->
+<!--        </div>-->
+<!--      </el-card>-->
+<!--      <el-card class="wallet-card">-->
+<!--        <div class="gas-title">Deploy AA Account</div>-->
+<!--        <el-button type="warning" round class="records-btn create-aa"-->
+<!--                   :disabled="isDisabledCreate"-->
+<!--                   :loading='createLoading' @click="onDeploy">-->
+<!--          Deploy-->
+<!--        </el-button>-->
+<!--      </el-card>-->
+      <el-button type="warning" round class="records-btn create-aa"
+                 :disabled="isDisabledCreate"
+                 :loading='createLoading' @click="onDeploy">
+        Deploy
+      </el-button>
     </div>
     <el-card v-else class="wallet-card">
       <div class="deploy-success-layout">
@@ -39,11 +47,12 @@
 </template>
 
 <script>
-import BigNumber from 'bignumber.js';
+// import BigNumber from 'bignumber.js';
 import {mapActions} from "vuex";
-import {transferGas, queryBalance, isCreate, getAddress, createAA} from "@/utils/Particle";
+// import {transferGas, queryBalance, isCreate, getAddress, createAA} from "@/utils/Particle";
+import {isCreate, getAddress, createAA} from "@/utils/Particle";
 
-const Max_Gas = 0.01;
+// const Max_Gas = 0.01;
 
 export default {
   name: "WalletCardComponent",
@@ -55,7 +64,7 @@ export default {
     input: '',
     gasLoading: false,
 
-    isDisabledCreate: true,
+    isDisabledCreate: false,
     createLoading: false,
   }),
   computed: {
@@ -75,55 +84,55 @@ export default {
   },
   methods: {
     ...mapActions(["setAAAddress"]),
-    predicateValue(value, fixed = 18) {
-      if (value == null) {
-        return null;
-      }
-      value = value.replace(/[^\d.]/g, ''); //清除"数字"和"."以外的字符
-      value = value.replace(/\.{2,}/g, '.'); //只保留第一个. 清除多余的
-      value = value.replace(/^0+\./g, '0.');
-      value = value.match(/^0+[1-9]+/)
-          ? (value = value.replace(/^0+/g, ''))
-          : value;
-      let reg = new RegExp(`^\\d*(\\.?\\d{0,${fixed}})`, 'g');
-      value = value.match(reg)[0] || '';
-      if (value == '.') {
-        value = '0.';
-      }
-      return value;
-    },
-    didInputStakeAmount() {
-      const value = this.predicateValue(this.input);
-      if (value !== this.input) {
-        this.input = value;
-      }
-    },
-    async onTransfer() {
-      const amount = this.input;
-      if (!amount) {
-        this.$message.error('Invalid amount');
-        return;
-      }
-
-      if (new BigNumber(amount).lt(Max_Gas)) {
-        this.$message.error(`Gas cannot be less than ${Max_Gas} ETH`);
-        return;
-      }
-
-      this.gasLoading = true;
-      const result = await transferGas(amount, this.aaAddress);
-      this.gasLoading = false;
-      if (result) {
-        this.isDisabledCreate = false;
-        this.$notify({
-          title: 'Success',
-          message: 'Transfer Success',
-          type: 'success'
-        });
-      } else {
-        this.$message.error('Transfer Fail!');
-      }
-    },
+    // predicateValue(value, fixed = 18) {
+    //   if (value == null) {
+    //     return null;
+    //   }
+    //   value = value.replace(/[^\d.]/g, ''); //清除"数字"和"."以外的字符
+    //   value = value.replace(/\.{2,}/g, '.'); //只保留第一个. 清除多余的
+    //   value = value.replace(/^0+\./g, '0.');
+    //   value = value.match(/^0+[1-9]+/)
+    //       ? (value = value.replace(/^0+/g, ''))
+    //       : value;
+    //   let reg = new RegExp(`^\\d*(\\.?\\d{0,${fixed}})`, 'g');
+    //   value = value.match(reg)[0] || '';
+    //   if (value == '.') {
+    //     value = '0.';
+    //   }
+    //   return value;
+    // },
+    // didInputStakeAmount() {
+    //   const value = this.predicateValue(this.input);
+    //   if (value !== this.input) {
+    //     this.input = value;
+    //   }
+    // },
+    // async onTransfer() {
+    //   const amount = this.input;
+    //   if (!amount) {
+    //     this.$message.error('Invalid amount');
+    //     return;
+    //   }
+    //
+    //   if (new BigNumber(amount).lt(Max_Gas)) {
+    //     this.$message.error(`Gas cannot be less than ${Max_Gas} ETH`);
+    //     return;
+    //   }
+    //
+    //   this.gasLoading = true;
+    //   const result = await transferGas(amount, this.aaAddress);
+    //   this.gasLoading = false;
+    //   if (result) {
+    //     this.isDisabledCreate = false;
+    //     this.$notify({
+    //       title: 'Success',
+    //       message: 'Transfer Success',
+    //       type: 'success'
+    //     });
+    //   } else {
+    //     this.$message.error('Transfer Fail!');
+    //   }
+    // },
     async onDeploy() {
       this.createLoading = true;
       const status = await createAA(this.contract, this.aaAddress, this.account);
@@ -145,14 +154,16 @@ export default {
         this.created = true;
       } else {
         this.aaAddress = await getAddress();
-        const [created, balance] = await Promise.all([
-          isCreate(this.contract, this.account),
-          queryBalance(this.aaAddress)
-        ]);
-        this.created = created;
-        if (new BigNumber(balance).gte(Max_Gas)) {
-          this.isDisabledCreate = false;
-        }
+        this.created = await isCreate(this.contract, this.account);
+
+        // const [created, balance] = await Promise.all([
+        //   isCreate(this.contract, this.account),
+        //   queryBalance(this.aaAddress)
+        // ]);
+        // this.created = created;
+        // if (new BigNumber(balance).gte(Max_Gas)) {
+        //   this.isDisabledCreate = false;
+        // }
       }
     }
   },
@@ -166,7 +177,7 @@ export default {
   width: 450px;
 }
 
-.dialog_item{
+.dialog_item {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -238,12 +249,12 @@ export default {
   align-items: center;
 }
 .deploy-icon {
-  font-size: 60px;
+  font-size: 45px;
   color: #52DEFF;
-  margin: 30px 15px;
+  margin: 15px;
 }
 .deploy-title {
-  font-size: 25px;
+  font-size: 23px;
   color: #52DEFF;
 }
 

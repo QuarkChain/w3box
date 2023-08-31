@@ -1,6 +1,5 @@
 import { FileContract } from "./contract";
-import BigNumber from "bignumber.js";
-import {getAAAccount, getTxReceipt, sendTxByAccount} from "@/utils/Particle";
+import { getTxReceipt, sendTx } from "@/utils/Particle";
 
 // contract
 export const getUploadByAddress = async (controller, address) => {
@@ -40,16 +39,7 @@ export const deleteFiles = async (controller, account, files) => {
 }
 
 async function send(tx) {
-    const smartAccount = getAAAccount();
-    const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
-    const balance = feeQuotesResult.verifyingPaymasterNative.feeQuote.balance;
-    const cost = feeQuotesResult.verifyingPaymasterNative.feeQuote.fee;
-    if(new BigNumber(balance).lt(new BigNumber(cost))){
-        // not enough balance
-        return 400;
-    }
-
-    const hash = await sendTxByAccount(smartAccount, tx);
+    const hash = await sendTx(tx);
     console.log(`Transaction Id: ${hash}`);
     const receipt = await getTxReceipt(hash);
     return receipt.status;

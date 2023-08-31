@@ -6,7 +6,7 @@ import {FileContract} from "@/utils/contract";
 const project_id = '1dfb2c01-d88d-436a-b7cb-caf8e7bfc931';
 const client_key = 'czEvMjfwi6s7dKONW2THRhYSGCl8gu5TUxUxWase';
 const app_id = '1be21ef9-fb2e-4642-8fde-b278c88b697b';
-const biconomy_api_key = '-0xYbbnJK.e60a3ff9-7b61-4ba4-bd46-905e3e0d72a0';
+const biconomy_api_key = '14QZAXT16.bfe830fc-7672-42db-9614-e4fec87ac902';
 
 export const getAAAccount = () => {
     return new SmartAccount(window.ethereum, {
@@ -114,16 +114,16 @@ export const sendTxByAccount = async (smartAccount, tx) => {
     //get fee quotes with tx or txs
     const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
 
-    // pay with Native tokens
-    const paidNativeUserOp = feeQuotesResult.verifyingPaymasterNative?.userOp;
-    const paidNativeUserOpHash = feeQuotesResult.verifyingPaymasterNative?.userOpHash;
-    // // gasless transaction userOp, maybe null
-    // const gaslessUserOp = feeQuotesResult.verifyingPaymasterGasless?.userOp;
-    // const gaslessUserOpHash = feeQuotesResult.verifyingPaymasterGasless?.userOpHash;
+    // // pay with Native tokens
+    // const paidNativeUserOp = feeQuotesResult.verifyingPaymasterNative?.userOp;
+    // const paidNativeUserOpHash = feeQuotesResult.verifyingPaymasterNative?.userOpHash;
+    // gasless transaction userOp, maybe null
+    const gaslessUserOp = feeQuotesResult.verifyingPaymasterGasless?.userOp;
+    const gaslessUserOpHash = feeQuotesResult.verifyingPaymasterGasless?.userOpHash;
 
     const txHash = await smartAccount.sendUserOperation({
-        userOp: paidNativeUserOp,
-        userOpHash: paidNativeUserOpHash
+        userOp: gaslessUserOp,
+        userOpHash: gaslessUserOpHash
     });
     console.log('txHash', txHash);
     return txHash;

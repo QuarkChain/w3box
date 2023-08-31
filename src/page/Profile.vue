@@ -147,20 +147,6 @@ export default {
       deleteFile(FileBoxController, this.account, item.name)
           .then((v) => {
             if (v) {
-              if(v === 400){
-                this.$confirm('The balance of the AA account is not enough to pay the gas fee, do you need to transfer the gas fee to it?',
-                    'Not enough balance!',
-                    {
-                      confirmButtonText: 'Ok',
-                      cancelButtonText: 'Cancel',
-                      type: 'warning'
-                    }
-                ).then(() => {
-                  EventBus.$emit('show', true);
-                }).catch(() => {});
-                return;
-              }
-
               this.result = this.result.filter(value => item !== value);
               this.$notify({
                 title: 'Success',
@@ -206,20 +192,6 @@ export default {
         deleteFiles(FileBoxController, this.account, names)
             .then((v) => {
               if (v) {
-                if(v === 400){
-                  this.$confirm('The balance of the AA account is not enough to pay the gas fee, do you need to transfer the gas fee to it?',
-                      'Not enough balance!',
-                      {
-                        confirmButtonText: 'Ok',
-                        cancelButtonText: 'Cancel',
-                        type: 'warning'
-                      }
-                  ).then(() => {
-                    EventBus.$emit('show', true);
-                  }).catch(() => {});
-                  return;
-                }
-
                 for(const item of this.checkedDeletes) {
                   this.result = this.result.filter(value => item !== value);
                 }
