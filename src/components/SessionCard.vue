@@ -17,11 +17,11 @@
     </el-card>
 
     <el-divider />
-    <div class="gas-title">Transfer Gas</div>
+    <div class="gas-title">Top up gas</div>
     <div class="wallet-top-item gas-layout">
       <el-input class="item-input" placeholder="0.00 ETH" @input="didInputStakeAmount" v-model="input" />
       <el-button type="warning" round class="records-btn" :loading='progress' @click="onTransfer">
-        Transfer
+        Top up
       </el-button>
     </div>
   </el-card>

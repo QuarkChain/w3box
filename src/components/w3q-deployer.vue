@@ -201,7 +201,7 @@ export default {
       file.status = 'failure';
       this.onError(error, file, this.files);
       if (error instanceof NotEnoughBalance) {
-        this.$confirm('The balance of the AA account is not enough to pay the gas fee, do you need to transfer the gas fee to it?',
+        this.$confirm('Paymaster\'s balance is insufficient to cover the gas fee for this transaction. Would you like to recharge your AA account with ETH to cover the gas fee proactively?',
           'Not enough balance!',
           {
             confirmButtonText: 'Ok',

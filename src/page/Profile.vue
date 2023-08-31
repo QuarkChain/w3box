@@ -63,7 +63,6 @@
 import {ethers} from "ethers";
 import UpdateIcon from "../components/icon";
 import {getUploadByAddress, deleteFile, deleteFiles} from '@/utils/profile';
-import EventBus from "@/utils/eventBus";
 
 const copy = require('clipboard-copy')
 const hexToString = (h) => ethers.utils.toUtf8String(h);

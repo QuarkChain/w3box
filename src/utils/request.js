@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import { getAAAccount, getTxReceipt, sendTxByAccount} from "@/utils/Particle";
+import { getAAAccount, getTxReceipt, sendTx, sendTxByAccount, GAS_NOT_ENOUGH_ERROR } from "@/utils/Particle";
 import { FileContract } from "@/utils/contract";
-import BigNumber from "bignumber.js";
+
 const sha3 = require('js-sha3').keccak_256;
 
 const stringToHex = (s) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(s));
@@ -27,13 +27,13 @@ const bufferChunk = (buffer, chunkSize) => {
   return result;
 }
 
-const clearOldFile = async (fileContract, smartAccount, account, chunkSize, hexName) => {
+const clearOldFile = async (fileContract, account, chunkSize, hexName) => {
   try {
     const oldChunkSize = await fileContract.countChunks(account, hexName);
     if (oldChunkSize > chunkSize) {
       // remove
       const populateTx = await fileContract.populateTransaction.remove(account, hexName);
-      const hash = await sendTxByAccount(smartAccount, populateTx);
+      const hash = await sendTx(populateTx);
       console.log(`Remove file: ${hexName}`);
       console.log(`Transaction Id: ${hash}`);
       const receipt = await getTxReceipt(hash);
@@ -74,7 +74,7 @@ export const request = async ({
 
   const fileContract = await FileContract(contractAddress);
   const smartAccount = getAAAccount();
-  const clear = await clearOldFile(fileContract, smartAccount, account, chunks.length, hexName, hexType)
+  const clear = await clearOldFile(fileContract, account, chunks.length, hexName, hexType)
   if (!clear) {
     onError(new Error("Check Old File Fail!"));
     return;
@@ -96,23 +96,21 @@ export const request = async ({
     try {
       // file is remove or change
       const populateTx = await fileContract.populateTransaction.writeChunk(account, hexName, hexType, index, hexData);
-      const feeQuotesResult = await smartAccount.getFeeQuotes(populateTx);
-      const balance = feeQuotesResult.verifyingPaymasterNative.feeQuote.balance;
-      const cost = feeQuotesResult.verifyingPaymasterNative.feeQuote.fee;
-      if(new BigNumber(balance).lt(new BigNumber(cost))){
+      const hash = await sendTxByAccount(smartAccount, populateTx);
+      if(hash === GAS_NOT_ENOUGH_ERROR) {
         // not enough balance
         uploadState = false;
         notEnoughBalance = true;
         break;
       }
 
-      const hash = await sendTxByAccount(smartAccount, populateTx);
       console.log(`Transaction Id: ${hash}`);
       const receipt = await getTxReceipt(hash);
       if (!receipt.status) {
         uploadState = false;
         break;
       }
+
       onProgress({ percent: Number(index) + 1});
     } catch (e) {
       console.log(e)

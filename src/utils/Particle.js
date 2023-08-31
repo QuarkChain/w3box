@@ -1,12 +1,15 @@
-import { SmartAccount } from '@particle-network/aa';
-import { chain } from "@/components/Wallet";
-import { ethers } from "ethers";
+import {SmartAccount} from '@particle-network/aa';
+import {chain} from "@/components/Wallet";
+import {ethers} from "ethers";
 import {FileContract} from "@/utils/contract";
+import BigNumber from "bignumber.js";
 
 const project_id = '1dfb2c01-d88d-436a-b7cb-caf8e7bfc931';
 const client_key = 'czEvMjfwi6s7dKONW2THRhYSGCl8gu5TUxUxWase';
 const app_id = '1be21ef9-fb2e-4642-8fde-b278c88b697b';
 const biconomy_api_key = '14QZAXT16.bfe830fc-7672-42db-9614-e4fec87ac902';
+
+export const GAS_NOT_ENOUGH_ERROR = 400;
 
 export const getAAAccount = () => {
     return new SmartAccount(window.ethereum, {
@@ -107,23 +110,48 @@ export const getTxReceipt = async (transactionHash) => {
 
 export const sendTx = async (tx) => {
     const smartAccount = getAAAccount();
-    return await sendTxByAccount(smartAccount, tx);
-}
-
-export const sendTxByAccount = async (smartAccount, tx) => {
-    //get fee quotes with tx or txs
-    const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
-
-    // // pay with Native tokens
-    // const paidNativeUserOp = feeQuotesResult.verifyingPaymasterNative?.userOp;
-    // const paidNativeUserOpHash = feeQuotesResult.verifyingPaymasterNative?.userOpHash;
     // gasless transaction userOp, maybe null
+    const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
     const gaslessUserOp = feeQuotesResult.verifyingPaymasterGasless?.userOp;
     const gaslessUserOpHash = feeQuotesResult.verifyingPaymasterGasless?.userOpHash;
 
     const txHash = await smartAccount.sendUserOperation({
         userOp: gaslessUserOp,
         userOpHash: gaslessUserOpHash
+    });
+    console.log('txHash', txHash);
+    return txHash;
+}
+
+export const sendTxByAccount = async (smartAccount, tx) => {
+    //get fee quotes with tx or txs
+    const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
+
+    // gasless transaction userOp, maybe null
+    const gaslessUserOp = feeQuotesResult.verifyingPaymasterGasless?.userOp;
+    const gaslessUserOpHash = feeQuotesResult.verifyingPaymasterGasless?.userOpHash;
+    if (gaslessUserOp) {
+        const txHash = await smartAccount.sendUserOperation({
+            userOp: gaslessUserOp,
+            userOpHash: gaslessUserOpHash
+        });
+        console.log('txHash', txHash);
+        return txHash;
+    }
+
+    // pay with Native tokens
+    const balance = feeQuotesResult.verifyingPaymasterNative.feeQuote.balance;
+    const cost = feeQuotesResult.verifyingPaymasterNative.feeQuote.fee;
+    if (new BigNumber(balance).lt(new BigNumber(cost))) {
+        // gas not enough
+        return GAS_NOT_ENOUGH_ERROR;
+    }
+
+    const paidNativeUserOp = feeQuotesResult.verifyingPaymasterNative?.userOp;
+    const paidNativeUserOpHash = feeQuotesResult.verifyingPaymasterNative?.userOpHash;
+    const txHash = await smartAccount.sendUserOperation({
+        userOp: paidNativeUserOp,
+        userOpHash: paidNativeUserOpHash
     });
     console.log('txHash', txHash);
     return txHash;
