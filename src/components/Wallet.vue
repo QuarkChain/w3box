@@ -135,7 +135,7 @@ export default {
             params: [
               {
                 chainId: chainID,
-                chainName: 'Ethereum Devnet',
+                chainName: 'Mumbai',
                 nativeCurrency: {
                   name: 'MATIC',
                   symbol: 'MATIC',

@@ -10,6 +10,11 @@ contract SimpleW3box {
 
     event AAChange(address account, address aaAccount);
 
+    modifier correctAuthor(address author){
+        require(author != address(0) && aaMap[author] == msg.sender, "wrong author");
+        _;
+    }
+
     struct File {
         uint256 time;
         bytes name;
@@ -32,23 +37,9 @@ contract SimpleW3box {
         fileFD = new FlatDirectory(0);
     }
 
-    receive() external payable {
-    }
-
-    function isCorrectAuthor(address author) private view returns (bool) {
-        if (author == address(0)) return false;
-        return aaMap[author] == msg.sender || msg.sender == author;
-    }
-
-    function setAAAccount(address aa) public {
-        aaMap[msg.sender] = aa;
-        emit AAChange(msg.sender, aa);
-    }
-
     function setAAAccountByAA(address account, uint8 v, bytes32 r, bytes32 s) public {
         require(verifyMessage(keccak256(abi.encodePacked(msg.sender)), v, r, s) == account, 'invalid user signature');
         aaMap[account] = msg.sender;
-
         emit AAChange(account, msg.sender);
     }
 
@@ -59,13 +50,17 @@ contract SimpleW3box {
         return signer;
     }
 
-    function write(address author, bytes memory name, bytes memory fileType, bytes calldata data) public payable {
+    function write(address author, bytes memory name, bytes memory fileType, bytes calldata data) public {
         writeChunk(author, name, fileType, 0, data);
     }
 
-    function writeChunk(address author, bytes memory name, bytes memory fileType, uint256 chunkId, bytes calldata data) public payable {
-        require(isCorrectAuthor(author), "wrong author");
-
+    function writeChunk(
+        address author,
+        bytes memory name,
+        bytes memory fileType,
+        uint256 chunkId,
+        bytes calldata data
+    ) correctAuthor(author) public {
         FileInfos storage info = fileInfos[author];
         bytes32 nameHash = keccak256(name);
         if (info.fileIds[nameHash] == 0) {
@@ -74,12 +69,10 @@ contract SimpleW3box {
             info.fileIds[nameHash] = info.files.length;
         }
 
-        fileFD.writeChunk{value : msg.value}(getNewName(author, name), chunkId, data);
+        fileFD.writeChunk(getNewName(author, name), chunkId, data);
     }
 
-    function remove(address author, bytes memory name) public returns (uint256) {
-        require(isCorrectAuthor(author), "wrong author");
-
+    function remove(address author, bytes memory name) correctAuthor(author) public returns (uint256) {
         FileInfos storage info = fileInfos[author];
         bytes32 nameHash = keccak256(name);
         require(info.fileIds[nameHash] != 0, "File does not exist");
@@ -95,8 +88,6 @@ contract SimpleW3box {
         delete info.fileIds[nameHash];
 
         uint256 id = fileFD.remove(getNewName(author, name));
-        fileFD.refund();
-        payable(author).transfer(address(this).balance);
         return id;
     }
 
@@ -158,3 +149,4 @@ contract SimpleW3box {
         }
     }
 }
+
