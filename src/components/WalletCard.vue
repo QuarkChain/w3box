@@ -6,7 +6,7 @@
     </div>
 
     <div class="dialog-msg">
-      W3Box utilizes an AA account to upload files—an ERC-4337 compatible smart contract account that is fully
+      W3Box utilizes an AA account to upload files — an ERC-4337 compatible smart contract account that is fully
       controlled by your currently connected address. Meanwhile, W3Box also takes advantage of the <span
         style="color:red">gasless</span> feature
       provided by AA.
