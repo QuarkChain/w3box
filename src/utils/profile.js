@@ -1,4 +1,5 @@
 import { FileContract } from "./contract";
+import { getTxReceipt, sendTx } from "@/utils/Particle";
 
 // contract
 export const getUploadByAddress = async (controller, address) => {
@@ -25,16 +26,21 @@ export const getUploadByAddress = async (controller, address) => {
     return files;
 }
 
-export const deleteFile = async (controller, file) => {
+export const deleteFile = async (controller, account, file) => {
     const fileContract = FileContract(controller);
-    const tx = await fileContract.remove(file);
-    const receipt = await tx.wait();
-    return receipt.status;
+    const tx = await fileContract.populateTransaction.remove(account, file);
+    return send(tx);
 }
 
-export const deleteFiles = async (controller, files) => {
+export const deleteFiles = async (controller, account, files) => {
     const fileContract = FileContract(controller);
-    const tx = await fileContract.removes(files);
-    const receipt = await tx.wait();
+    const tx = await fileContract.populateTransaction.removes(account, files);
+    return send(tx);
+}
+
+async function send(tx) {
+    const hash = await sendTx(tx);
+    console.log(`Transaction Id: ${hash}`);
+    const receipt = await getTxReceipt(hash);
     return receipt.status;
 }

@@ -79,14 +79,19 @@ export default {
   },
   components: { UpdateIcon },
   computed: {
-    chainConfig() {
-      return this.$store.state.chainConfig;
+    account() {
+      return this.$store.state.account;
+    },
+    aaAddress() {
+      return this.$store.state.aaAddress;
     },
   },
   watch: {
-    chainConfig: function () {
-      if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
+    aaAddress: function () {
+      if (this.$store.state.aaAddress) {
         this.onSearch();
+      } else {
+        this.result = [];
       }
     }
   },
@@ -111,10 +116,11 @@ export default {
       this.$router.push({path: "/"});
     },
     onSearch() {
-      const { FileBoxController} = this.$store.state.chainConfig;
-      if (!FileBoxController) {
+      if (!this.aaAddress) {
+        this.result = [];
         return;
       }
+      const { FileBoxController} = this.$store.state.chainConfig;
       getUploadByAddress(FileBoxController, this.$route.params.address)
           .then(value => {
             this.result = value;
@@ -137,7 +143,7 @@ export default {
         return;
       }
       item.showProgress = true;
-      deleteFile(FileBoxController, item.name)
+      deleteFile(FileBoxController, this.account, item.name)
           .then((v) => {
             if (v) {
               this.result = this.result.filter(value => item !== value);
@@ -182,7 +188,7 @@ export default {
           item.showProgress = true;
           names.push(item.name);
         }
-        deleteFiles(FileBoxController, names)
+        deleteFiles(FileBoxController, this.account, names)
             .then((v) => {
               if (v) {
                 for(const item of this.checkedDeletes) {

@@ -6,7 +6,7 @@
       </b-navbar-item>
     </template>
     <template #end>
-      <b-navbar-item class="connection" tag="div">
+      <b-navbar-item v-if="aaAddress" class="connection" tag="div">
         <SessionWallet />
       </b-navbar-item>
       <b-navbar-item class="connection" tag="div">
@@ -25,6 +25,11 @@ export default {
   components: {
     Wallet,
     SessionWallet
+  },
+  computed: {
+    aaAddress() {
+      return this.$store.state.aaAddress;
+    },
   }
 }
 </script>

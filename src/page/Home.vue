@@ -1,22 +1,17 @@
 <template>
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
-    <div v-if="!this.sessionKey">
+    <div>
       <p class="title">
-        To upload files silently, you need <br/> an AA wallet and an activated Session Key.
+        The File Hosting Service on Polygon Mumbai,<br/>
+        And use the AA wallet to submit the transaction.
       </p>
-      <button
-          class="btn-create"
-          @click.stop="goAA"
-      >
-        Create&nbsp;&nbsp;|&nbsp;&nbsp;Manage
-      </button>
-    </div>
-    <div v-else>
-      <p class="title">
-        The File Hosting Service on Arbitrum Goerli
-      </p>
-      <w3q-deployer multiple :fileContract="contract" :account="aaAccount" class="drop"/>
+      <w3q-deployer multiple
+                    :fileContract="contract"
+                    :fdContract="fdContract"
+                    :account="account"
+                    :aaAccount="aaAccount"
+                    class="drop"/>
     </div>
   </div>
 </template>
@@ -35,17 +30,19 @@ export default {
       }
       return null;
     },
-    aaAccount() {
-      return this.$store.state.aaAccount;
+    fdContract() {
+      if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
+        const {FDContract} = this.$store.state.chainConfig;
+        return FDContract;
+      }
+      return null;
     },
-    sessionKey() {
-      return this.$store.state.sessionKey;
-    }
-  },
-  methods: {
-    goAA() {
-      this.$router.push({path: "/aa"});
-    }
+    account() {
+      return this.$store.state.account;
+    },
+    aaAccount() {
+      return this.$store.state.aaAddress;
+    },
   }
 }
 </script>
@@ -58,36 +55,19 @@ export default {
   align-items: center;
 }
 .home-logo {
-  margin-top: 35px;
+  margin-top: 20px;
   width: 230px;
 }
 
 .title {
-  font-size: 30px;
+  font-size: 25px;
   color: #333333;
-  margin-bottom: 55px;
-  margin-top: 30px;
-  line-height: 50px;
+  margin: 30px 0;
+  line-height: 30px;
 }
 
 .drop {
-  width: 600px
-}
-
-.btn-create {
-  transition: all 0.1s ease 0s;
-  width: 180px;
-  height: 52px;
-  color: #ffffff;
-  font-size: 18px;
-  border: 0;
-  background: #52DEFF;
-  border-radius: 36px;
-  cursor: pointer;
-}
-.btn-create:hover {
-  background-color: #52DEFF90;
-  border: 0;
+  width: 550px
 }
 
 @media screen and (max-width: 500px) {

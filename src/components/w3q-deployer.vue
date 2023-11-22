@@ -20,6 +20,7 @@
 import {NotEnoughBalance, request} from '@/utils/request';
 import UploadList from './upload-list';
 import UploadDragger from './upload-dragger';
+import EventBus from "@/utils/eventBus";
 const copy = require('clipboard-copy')
 
 const sha3 = require('js-sha3').keccak_256;
@@ -30,11 +31,19 @@ export default {
   name: 'w3q-deployer',
   components: { UploadDragger, UploadList },
   props: {
+    fileContract: {
+      type: String,
+      default: ""
+    },
+    fdContract: {
+      type: String,
+      default: ""
+    },
     account: {
       type: String,
       default: ""
     },
-    fileContract: {
+    aaAccount: {
       type: String,
       default: ""
     },
@@ -72,7 +81,7 @@ export default {
   },
   computed: {
     enable() {
-      return this.fileContract !== null;
+      return this.aaAccount !== null;
     },
     chunkLength() {
       return 24 * 1024 - 326;
@@ -150,6 +159,7 @@ export default {
         chunkLength: this.chunkLength,
         account: this.account,
         contractAddress: this.fileContract,
+        fdContract: this.fdContract,
         dirPath: this.dirPath,
         file: file,
         onSuccess: this.handleSuccess.bind(this, file),
@@ -191,9 +201,16 @@ export default {
       file.status = 'failure';
       this.onError(error, file, this.files);
       if (error instanceof NotEnoughBalance) {
-        this.$notify.error({
-          title: 'Not enough balance!',
-          message: 'File >=24kb requires staking token.'
+        this.$confirm('Paymaster\'s balance is insufficient to cover the gas fee for this transaction. Would you like to recharge your AA account with ETH to cover the gas fee proactively?',
+          'Not enough balance!',
+          {
+            confirmButtonText: 'Ok',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }
+        ).then(() => {
+          EventBus.$emit('show', true);
+        }).catch(() => {
         });
       }
     },
