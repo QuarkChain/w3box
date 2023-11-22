@@ -1,71 +1,52 @@
 <template>
   <el-card class="dialog_card">
     <div class="dialog_item">
-      <p class="item-title">Deploy AA Account</p>
+      <p class="item-title">Create/Login SessionKey Account</p>
       <i class="el-icon-close item-close" @click="$parent.close()"/>
     </div>
 
     <div class="dialog-msg">
-      W3Box utilizes an AA account to upload files — an ERC-4337 compatible smart contract account that is fully
-      controlled by your currently connected address. Meanwhile, W3Box also takes advantage of the <span
-        style="color:red">gasless</span> feature
-      provided by AA.
+      W3Box uses a SessionKey account to upload files - an account that is only
+      stored locally and controlled entirely by the address you are currently connected to.
     </div>
 
-    <div v-if="!this.created">
-<!--      <el-card class="wallet-card">-->
-<!--        <div class="gas-title">1. Top up Gas Credit</div>-->
-<!--        <div class="wallet-top-item gas-layout">-->
-<!--          <el-input class="item-input" placeholder=">= 0.01 ETH" @input="didInputStakeAmount" v-model="input"/>-->
-<!--          <el-button type="warning" round class="records-btn"-->
-<!--                     :loading='gasLoading' @click="onTransfer">-->
-<!--            Transfer-->
-<!--          </el-button>-->
-<!--        </div>-->
-<!--      </el-card>-->
-<!--      <el-card class="wallet-card">-->
-<!--        <div class="gas-title">Deploy AA Account</div>-->
-<!--        <el-button type="warning" round class="records-btn create-aa"-->
-<!--                   :disabled="isDisabledCreate"-->
-<!--                   :loading='createLoading' @click="onDeploy">-->
-<!--          Deploy-->
-<!--        </el-button>-->
-<!--      </el-card>-->
-      <el-button type="warning" round class="records-btn create-aa"
-                 :disabled="isDisabledCreate"
-                 :loading='createLoading' @click="onDeploy">
-        Deploy
-      </el-button>
-    </div>
-    <el-card v-else class="wallet-card">
+    <el-input v-if="!isLogined" class="input-password" type="password"
+              placeholder="enter password" v-model="input"/>
+
+    <el-card v-if="isLogined" class="wallet-card">
       <div class="deploy-success-layout">
         <i class="el-icon-success deploy-icon"/>
-        <span class="deploy-title">Deploy Success</span>
+        <span class="deploy-title">Login Success</span>
       </div>
     </el-card>
+    <el-button v-else-if="this.created" type="warning" round class="records-btn"
+               :loading='loading' @click="onLogin">
+      Login
+    </el-button>
+    <el-button v-else type="warning" round class="records-btn"
+               :loading='loading' @click="onRegister">
+      Create
+    </el-button>
   </el-card>
 </template>
 
 <script>
-// import BigNumber from 'bignumber.js';
 import {mapActions} from "vuex";
-// import {transferGas, queryBalance, isCreate, getAddress, createAA} from "@/utils/Particle";
-import {isCreate, getAddress, createAA} from "@/utils/Particle";
-
-// const Max_Gas = 0.01;
+import {
+  createSession, encryptSession,
+  querySessionKey, saveSessionKey, signSeed
+} from "@/utils/Session";
 
 export default {
   name: "WalletCardComponent",
   props: ['canCancel'],
   data: () => ({
-    aaAddress: '',
+    sessionResult: null,
+    isLogined: false,
     created: false,
 
     input: '',
-    gasLoading: false,
-
-    isDisabledCreate: false,
-    createLoading: false,
+    loading: false,
   }),
   computed: {
     account() {
@@ -83,87 +64,78 @@ export default {
     this.initData();
   },
   methods: {
-    ...mapActions(["setAAAddress"]),
-    // predicateValue(value, fixed = 18) {
-    //   if (value == null) {
-    //     return null;
-    //   }
-    //   value = value.replace(/[^\d.]/g, ''); //清除"数字"和"."以外的字符
-    //   value = value.replace(/\.{2,}/g, '.'); //只保留第一个. 清除多余的
-    //   value = value.replace(/^0+\./g, '0.');
-    //   value = value.match(/^0+[1-9]+/)
-    //       ? (value = value.replace(/^0+/g, ''))
-    //       : value;
-    //   let reg = new RegExp(`^\\d*(\\.?\\d{0,${fixed}})`, 'g');
-    //   value = value.match(reg)[0] || '';
-    //   if (value == '.') {
-    //     value = '0.';
-    //   }
-    //   return value;
-    // },
-    // didInputStakeAmount() {
-    //   const value = this.predicateValue(this.input);
-    //   if (value !== this.input) {
-    //     this.input = value;
-    //   }
-    // },
-    // async onTransfer() {
-    //   const amount = this.input;
-    //   if (!amount) {
-    //     this.$message.error('Invalid amount');
-    //     return;
-    //   }
-    //
-    //   if (new BigNumber(amount).lt(Max_Gas)) {
-    //     this.$message.error(`Gas cannot be less than ${Max_Gas} ETH`);
-    //     return;
-    //   }
-    //
-    //   this.gasLoading = true;
-    //   const result = await transferGas(amount, this.aaAddress);
-    //   this.gasLoading = false;
-    //   if (result) {
-    //     this.isDisabledCreate = false;
-    //     this.$notify({
-    //       title: 'Success',
-    //       message: 'Transfer Success',
-    //       type: 'success'
-    //     });
-    //   } else {
-    //     this.$message.error('Transfer Fail!');
-    //   }
-    // },
-    async onDeploy() {
-      this.createLoading = true;
-      const status = await createAA(this.contract, this.aaAddress, this.account);
-      this.createLoading = false;
-      if (status) {
+    ...mapActions(["setSessionKey", "setSessionAddr"]),
+    async onRegister() {
+      const password = this.input;
+      if (!password) {
+        this.$message.error('Invalid password');
+        return;
+      }
+      if (!this.signature) {
+        this.$message.error('Need signature');
+        return;
+      }
+
+      this.loading = true;
+      const result = await createSession(this.contract, this.signature, password);
+      this.loading = false;
+      if (result) {
+        this.setSessionKey(result.sessionKey);
+        this.setSessionAddr(result.address);
+        saveSessionKey(this.account, result.sessionKey);
+
         this.$notify({
           title: 'Success',
-          message: 'Deploy AA Account Success',
+          message: 'Register Success',
           type: 'success'
         });
-        this.setAAAddress(this.aaAddress);
         this.$parent.close();
       } else {
-        this.$message.error('Deploy Fail!');
+        this.$message.error('Register Fail!');
+      }
+    },
+    async onLogin() {
+      const password = this.input;
+      if (!password) {
+        this.$message.error('Invalid password');
+        return;
+      }
+      if (!this.signature) {
+        this.$message.error('Need signature');
+        return;
+      }
+
+      const sessionKey = await encryptSession(password, this.signature, this.sessionResult.iv, this.sessionResult.encrypt);
+      if (sessionKey) {
+        this.setSessionKey(sessionKey);
+        this.setSessionAddr(this.sessionResult.address);
+        saveSessionKey(this.account, sessionKey);
+
+        this.$notify({
+          title: 'Success',
+          message: 'Login Success',
+          type: 'success'
+        });
+        this.$parent.close();
+      } else {
+        this.$message.error('Password Error');
       }
     },
     async initData() {
-      if (this.$store.state.aaAddress) {
-        this.created = true;
+      if (this.$store.state.sessionKey) {
+        this.isLogined = true;
       } else {
-        this.aaAddress = await getAddress();
-        this.created = await isCreate(this.contract, this.account);
+        this.sessionResult = await querySessionKey(this.contract);
+        this.created = this.sessionResult !== undefined;
 
-        // const [created, balance] = await Promise.all([
-        //   isCreate(this.contract, this.account),
-        //   queryBalance(this.aaAddress)
-        // ]);
-        // this.created = created;
-        // if (new BigNumber(balance).gte(Max_Gas)) {
-        //   this.isDisabledCreate = false;
-        // }
+        const chain = 7011893061;
+        const sign = await signSeed(this.account, chain);
+        if (!sign) {
+          this.$message.error('User rejected sign');
+          this.$parent.close();
+          return;
+        }
+        this.signature = sign;
       }
     }
   },
@@ -183,6 +155,7 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
+
 .item-title {
   font-size: 20px;
   color: #000000;
@@ -193,6 +166,7 @@ export default {
   font-size: 22px;
   cursor: pointer;
 }
+
 .dialog-msg {
   margin-top: 35px;
   text-align: left;
@@ -206,27 +180,21 @@ export default {
   margin-top: 30px;
   border-radius: 16px;
 }
-.gas-title {
-  font-size: 17px;
-  color: #222222;
-  text-align: left;
+
+.input-password {
+  width: 75%;
+  margin-bottom: 25px;
+  margin-top: 50px;
 }
-.wallet-top-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 15px 0;
-  justify-content: space-between;
-}
-.item-input {
-  width: 55%;
-}
+
 .records-btn {
   background: #52DEFF;
   border: 1px solid #52DEFF;
   font-size: 17px;
-  width: 120px;
+  width: 160px;
+  margin-bottom: 15px;
 }
+
 .records-btn:focus,
 .records-btn:hover {
   background: #52DEFFA0;
@@ -236,10 +204,6 @@ export default {
 .records-btn:disabled:hover {
   background: rgba(104, 141, 150, 0.31);
   border: 0;
-}
-
-.create-aa {
-  margin: 25px 0 15px;
 }
 
 .deploy-success-layout {

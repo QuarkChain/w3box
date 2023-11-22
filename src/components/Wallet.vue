@@ -27,8 +27,8 @@
 <script>
 import { mapActions } from "vuex";
 import { chains } from '@/store/state';
-import { getAddress, isCreate } from "@/utils/Particle";
 import WalletCard from './WalletCard.vue';
+import {createWallet, getSessionKey} from "@/utils/Session";
 
 export class UnsupportedChainIdError extends Error {
   constructor() {
@@ -66,7 +66,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["setChainConfig", "setAccount", "setAAAddress"]),
+    ...mapActions(["setChainConfig", "setAccount", "setSessionKey", "setSessionAddr"]),
     goProfile() {
       this.$router.push({path: "/address/" + this.account});
     },
@@ -83,18 +83,21 @@ export default {
     async handleChainChanged() {
       const newChainId = await window.ethereum.request({method: "eth_chainId"});
       if (chainID !== newChainId) {
-        this.setAAAddress(null);
+        this.setSessionKey(null);
+        this.setSessionAddr(null)
         this.setAccount(null);
       }
     },
     async handleAccountsChanged() {
-      this.setAAAddress(null);
+      this.setSessionKey(null);
+      this.setSessionAddr(null)
       this.setAccount(null);
     },
     async handleAccounts(accounts) {
       if (accounts.length === 0) {
         this.setAccount(null);
-        this.setAAAddress(null);
+        this.setSessionKey(null);
+        this.setSessionAddr(null);
         console.warn(
             "MetaMask is locked or the user has not connected any accounts"
         );
@@ -107,7 +110,7 @@ export default {
       }
 
       this.setAccount(accounts[0]);
-      await this.initAAInfo();
+      await this.initSessionInfo();
     },
     async login() {
       window.ethereum
@@ -162,14 +165,14 @@ export default {
       }
     },
 
-    async initAAInfo() {
-      const created = await isCreate(this.contract, this.account);
-      if (created) {
-        // is created AA
-        const address = await getAddress();
-        this.setAAAddress(address);
+    async initSessionInfo() {
+      const sessionKey = getSessionKey(this.account);
+      if (sessionKey) {
+        // login success
+        this.setSessionKey(sessionKey);
+        const wallet = createWallet(sessionKey);
+        this.setSessionAddr(wallet.address);
       } else {
-        // first use DApp, need create AA wallet
         this.isShow = true;
       }
     },

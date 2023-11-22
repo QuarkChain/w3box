@@ -5,18 +5,21 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     chainConfig: {},
-    account: null,
-    aaAddress: null,
+    account: '',
+    sessionKey: '',
+    sessionAddr: '',
   },
   mutations: {
     chainMutation: (state, payload) => state.chainConfig = payload,
     accountMutation:  (state, payload) => state.account = payload,
-    aaAddressMutation:  (state, payload) => state.aaAddress = payload,
+    sessionKeyMutation:  (state, payload) => state.sessionKey = payload,
+    sessionAddrMutation:  (state, payload) => state.sessionAddr = payload,
   },
   actions: {
     setChainConfig: ({ commit }, payload) => commit('chainMutation', payload),
     setAccount: ({ commit }, payload) => commit('accountMutation', payload),
-    setAAAddress: ({ commit }, payload) => commit('aaAddressMutation', payload),
+    setSessionKey: ({ commit }, payload) => commit('sessionKeyMutation', payload),
+    setSessionAddr: ({ commit }, payload) => commit('sessionAddrMutation', payload),
   },
   modules: {
   },
