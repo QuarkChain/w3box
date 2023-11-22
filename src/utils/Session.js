@@ -106,3 +106,20 @@ export const queryBalance = async (sessionAddress) => {
     const value = await provider.getBalance(sessionAddress);
     return ethers.utils.formatEther(value);
 }
+
+export const transferGas = async (amount, to) => {
+    try {
+        let transaction = {
+            to: to.toLowerCase(),
+            // Convert currency unit from ether to wei
+            value: ethers.utils.parseEther(amount)
+        }
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const tx = await signer.sendTransaction(transaction);
+        const receipt = await tx.wait();
+        return receipt.status;
+    } catch (e) {
+        return false;
+    }
+}

@@ -29,6 +29,7 @@ import { mapActions } from "vuex";
 import { chains } from '@/store/state';
 import WalletCard from './WalletCard.vue';
 import {createWallet, getSessionKey} from "@/utils/Session";
+import EventBus from "@/utils/eventBus";
 
 export class UnsupportedChainIdError extends Error {
   constructor() {
@@ -86,12 +87,14 @@ export default {
         this.setSessionKey(null);
         this.setSessionAddr(null)
         this.setAccount(null);
+        this.isShow = false;
       }
     },
     async handleAccountsChanged() {
       this.setSessionKey(null);
       this.setSessionAddr(null)
       this.setAccount(null);
+      this.isShow = false;
     },
     async handleAccounts(accounts) {
       if (accounts.length === 0) {
@@ -186,6 +189,10 @@ export default {
     // this.connectWallet();
     window.ethereum.on("chainChanged", this.handleChainChanged);
     window.ethereum.on("accountsChanged", this.handleAccountsChanged);
+
+    EventBus.$on('showCreate', value => {
+      this.isShow = value;
+    });
   },
 };
 </script>

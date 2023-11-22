@@ -1,7 +1,7 @@
 <template>
   <el-card class="dialog_card">
     <div class="dialog_item">
-      <p class="item-title">AA Account</p>
+      <p class="item-title">SessionKey Account</p>
       <i class="el-icon-close item-close" @click="$parent.close()"/>
     </div>
     <el-card class="wallet-card">
@@ -30,7 +30,7 @@
 <script>
 import BigNumber from 'bignumber.js';
 import {mapActions} from "vuex";
-import {transferGas, queryBalance} from "@/utils/Particle";
+import {transferGas, queryBalance} from "@/utils/Session";
 const copy = require('clipboard-copy')
 
 export default {
@@ -43,7 +43,7 @@ export default {
   }),
   computed: {
     aaAddress() {
-      return this.$store.state.aaAddress;
+      return this.$store.state.sessionAddr;
     },
     accountShort() {
       return (
@@ -61,7 +61,7 @@ export default {
     this.loopQueryBalance();
   },
   methods: {
-    ...mapActions(["setAccount", "setAAAddress"]),
+    ...mapActions(["setAccount", "setSessionKey", "setSessionAddr"]),
     parseFixed(value) {
       if (isNaN(value)) {
         value = 0;
@@ -110,7 +110,8 @@ export default {
     },
     onDisconnct() {
       this.setAccount(null);
-      this.setAAAddress(null);
+      this.setSessionKey(null);
+      this.setSessionAddr(null);
       this.$parent.close();
     },
     async onTransfer() {

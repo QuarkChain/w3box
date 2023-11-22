@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import {queryBalance} from "@/utils/Particle";
+import {queryBalance} from "@/utils/Session";
 import BigNumber from 'bignumber.js';
 import SessionCard from './SessionCard';
 import EventBus from '@/utils/eventBus';
@@ -34,12 +34,12 @@ export default {
     SessionCard
   },
   computed: {
-    aaAddress() {
-      return this.$store.state.aaAddress;
+    sessionAddress() {
+      return this.$store.state.sessionAddr;
     },
   },
   watch: {
-    aaAddress(newVal) {
+    sessionAddress(newVal) {
       if (!newVal) {
         this.isShow = false;
       }
@@ -68,8 +68,8 @@ export default {
       this.loadInterval = setInterval(this.loopQueryBalance, 20000,);
     },
     async loopQueryBalance() {
-      if (this.aaAddress) {
-        const balance = await queryBalance(this.aaAddress);
+      if (this.sessionAddress) {
+        const balance = await queryBalance(this.sessionAddress);
         this.balance = this.parseFixed(balance);
       }
     },

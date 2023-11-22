@@ -1,10 +1,21 @@
 <template>
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
-    <div>
+    <div v-if="!this.aaAccount">
       <p class="title">
-        The File Hosting Service on Polygon Mumbai,<br/>
-        And use the AA wallet to submit the transaction.
+        To upload files silently, you need <br/> an Session Key account.
+      </p>
+      <button
+          class="btn-create"
+          @click.stop="goSession"
+      >
+        Create
+      </button>
+    </div>
+    <div v-else>
+      <p class="title">
+        The File Hosting Service on Devnet-11,<br/>
+        And use the SessionKey account to submit the transaction.
       </p>
       <w3q-deployer multiple
                     :fileContract="contract"
@@ -18,6 +29,7 @@
 
 <script>
 import W3qDeployer from '@/components/w3q-deployer.vue';
+import EventBus from "@/utils/eventBus";
 
 export default {
   name: 'HomePage',
@@ -41,8 +53,17 @@ export default {
       return this.$store.state.account;
     },
     aaAccount() {
-      return this.$store.state.aaAddress;
+      return this.$store.state.sessionAddr;
     },
+  },
+  methods: {
+    goSession() {
+      if (this.account) {
+        EventBus.$emit('showCreate', true);
+      } else {
+        this.$message.error('Please connect your wallet first!');
+      }
+    }
   }
 }
 </script>
@@ -62,12 +83,30 @@ export default {
 .title {
   font-size: 25px;
   color: #333333;
-  margin: 30px 0;
-  line-height: 30px;
+  margin-bottom: 55px;
+  margin-top: 30px;
+  line-height: 50px;
 }
 
 .drop {
-  width: 550px
+  width: 550px;
+  margin: 0 auto;
+}
+
+.btn-create {
+  transition: all 0.1s ease 0s;
+  width: 180px;
+  height: 52px;
+  color: #ffffff;
+  font-size: 18px;
+  border: 0;
+  background: #52DEFF;
+  border-radius: 36px;
+  cursor: pointer;
+}
+.btn-create:hover {
+  background-color: #52DEFF90;
+  border: 0;
 }
 
 @media screen and (max-width: 500px) {
