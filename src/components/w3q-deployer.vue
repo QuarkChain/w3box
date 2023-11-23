@@ -84,7 +84,7 @@ export default {
       return this.aaAccount !== null;
     },
     chunkLength() {
-      return 24 * 1024 - 326;
+      return 4096 * 31;
     }
   },
   methods: {

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import {FileContractSession} from "@/utils/contract";
-import {EncodeBlobs, GenerateBlobs, Send4844Tx} from "@/utils/send-4844-tx";
+import {EncodeBlobs, GenerateBlobs, getBlobHash, Send4844Tx} from "@/utils/send-4844-tx";
 import {getSessionKey, queryBalance} from "@/utils/Session";
 
 const MAX_BLOB_COUNT = 3;
@@ -105,7 +105,7 @@ export const request = async ({
     let hasChange = false;
     for (let j = 0; j < blobArr.length; j++) {
       const dataHash = await fileContract.getChunkHash(account, hexName, indexArr[j]);
-      const localHash = versionedHashes[j];
+      const localHash = getBlobHash(versionedHashes[j]);
       if (dataHash !== localHash) {
         hasChange = true;
         break;
@@ -113,7 +113,8 @@ export const request = async ({
     }
     if (!hasChange) {
       for (let j = 0; j < blobArr.length; j++) {
-        onProgress({percent: indexArr[j]});
+        onProgress({percent: Number(indexArr[j]) + 1});
+
       }
       console.log(`File ${name} chunkId: ${indexArr}: The data is not changed.`);
       continue;
@@ -134,8 +135,6 @@ export const request = async ({
       const tx = await fileContract.populateTransaction.writeChunk(account, hexName, hexType, indexArr, lenArr, {
         value: value,
       });
-      // TODO
-      tx.gasLimit = 3000000;
       const hash = send4844Tx.sendTx(blobArr, proofs, commitments, versionedHashes, tx);
       console.log(`Transaction Id: ${hash}`);
       const receipt = await send4844Tx.getTxReceipt(hash);
@@ -145,7 +144,7 @@ export const request = async ({
       }
 
       for (let j = 0; j < blobArr.length; j++) {
-        onProgress({percent: indexArr[j]});
+        onProgress({percent: Number(indexArr[j]) + 1});
       }
     } catch (e) {
       console.log(e)

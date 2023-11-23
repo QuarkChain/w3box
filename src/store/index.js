@@ -5,10 +5,10 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     chainConfig: {},
-    account: '',
-    signature: '',
-    sessionKey: '',
-    sessionAddr: '',
+    account: null,
+    signature: null,
+    sessionKey: null,
+    sessionAddr: null,
   },
   mutations: {
     chainMutation: (state, payload) => state.chainConfig = payload,

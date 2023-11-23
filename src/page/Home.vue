@@ -1,35 +1,21 @@
 <template>
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
-    <div v-if="!this.aaAccount">
-      <p class="title">
-        To upload files silently, you need <br/> a Session Key account.
-      </p>
-      <button
-          class="btn-create"
-          @click.stop="goSession"
-      >
-        Create
-      </button>
-    </div>
-    <div v-else>
-      <p class="title">
-        The File Hosting Service on Devnet-11,<br/>
-        And use the SessionKey account to submit the transaction.
-      </p>
-      <w3q-deployer multiple
-                    :fileContract="contract"
-                    :fdContract="fdContract"
-                    :account="account"
-                    :aaAccount="aaAccount"
-                    class="drop"/>
-    </div>
+    <p class="title">
+      The File Hosting Service on Devnet-11,<br/>
+      And use the SessionKey account to submit the transaction.
+    </p>
+    <w3q-deployer multiple
+                  :fileContract="contract"
+                  :fdContract="fdContract"
+                  :account="account"
+                  :aaAccount="aaAccount"
+                  class="drop"/>
   </div>
 </template>
 
 <script>
 import W3qDeployer from '@/components/w3q-deployer.vue';
-import EventBus from "@/utils/eventBus";
 
 export default {
   name: 'HomePage',
@@ -56,15 +42,6 @@ export default {
       return this.$store.state.sessionAddr;
     },
   },
-  methods: {
-    goSession() {
-      if (this.account) {
-        EventBus.$emit('showCreate', true);
-      } else {
-        this.$message.error('Please connect your wallet first!');
-      }
-    }
-  }
 }
 </script>
 
@@ -75,6 +52,7 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+
 .home-logo {
   margin-top: 20px;
   width: 230px;
@@ -104,6 +82,7 @@ export default {
   border-radius: 36px;
   cursor: pointer;
 }
+
 .btn-create:hover {
   background-color: #52DEFF90;
   border: 0;

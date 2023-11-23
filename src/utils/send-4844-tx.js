@@ -326,3 +326,10 @@ export async function GenerateBlobs(blobs) {
         return null;
     }
 }
+
+export function getBlobHash(localHash) {
+    localHash = getBytes(localHash);
+    const hash = new Uint8Array(32);
+    hash.set(localHash.subarray(0, 32 - 8));
+    return ethers.utils.hexlify(hash);
+}
