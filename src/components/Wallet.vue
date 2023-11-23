@@ -28,7 +28,7 @@
 import { mapActions } from "vuex";
 import { chains } from '@/store/state';
 import WalletCard from './WalletCard.vue';
-import {createWallet, getSessionKey} from "@/utils/Session";
+import {createWallet, getSessionKey, signSeed} from "@/utils/Session";
 import EventBus from "@/utils/eventBus";
 
 export class UnsupportedChainIdError extends Error {
@@ -67,7 +67,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["setChainConfig", "setAccount", "setSessionKey", "setSessionAddr"]),
+    ...mapActions(["setChainConfig", "setAccount", "setSessionKey", "setSessionAddr", "setSignature"]),
     goProfile() {
       this.$router.push({path: "/address/" + this.account});
     },
@@ -91,6 +91,7 @@ export default {
       }
     },
     async handleAccountsChanged() {
+      this.setSignature(null);
       this.setSessionKey(null);
       this.setSessionAddr(null)
       this.setAccount(null);
@@ -98,6 +99,7 @@ export default {
     },
     async handleAccounts(accounts) {
       if (accounts.length === 0) {
+        this.setSignature(null);
         this.setAccount(null);
         this.setSessionKey(null);
         this.setSessionAddr(null);
@@ -176,6 +178,12 @@ export default {
         const wallet = createWallet(sessionKey);
         this.setSessionAddr(wallet.address);
       } else {
+        const sign = await signSeed(this.account, chain);
+        if (!sign) {
+          this.$message.error('User rejected sign');
+          return;
+        }
+        this.setSignature(sign);
         this.isShow = true;
       }
     },

@@ -3,7 +3,7 @@
     <img class="home-logo" src="../assets/home.png"/>
     <div v-if="!this.aaAccount">
       <p class="title">
-        To upload files silently, you need <br/> an Session Key account.
+        To upload files silently, you need <br/> a Session Key account.
       </p>
       <button
           class="btn-create"

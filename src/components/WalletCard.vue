@@ -34,7 +34,7 @@
 import {mapActions} from "vuex";
 import {
   createSession, encryptSession,
-  querySessionKey, saveSessionKey, signSeed
+  querySessionKey, saveSessionKey
 } from "@/utils/Session";
 
 export default {
@@ -59,6 +59,9 @@ export default {
       }
       return null;
     },
+    signature() {
+      return this.$store.state.signature;
+    }
   },
   created() {
     this.initData();
@@ -77,7 +80,10 @@ export default {
       }
 
       this.loading = true;
-      const result = await createSession(this.contract, this.signature, password);
+      const result = await createSession(this.contract, this.signature, password)
+          .catch(() => {
+            this.loading = false;
+          });
       this.loading = false;
       if (result) {
         this.setSessionKey(result.sessionKey);
@@ -127,15 +133,6 @@ export default {
       } else {
         this.sessionResult = await querySessionKey(this.contract);
         this.created = this.sessionResult !== undefined;
-
-        const chain = 7011893061;
-        const sign = await signSeed(this.account, chain);
-        if (!sign) {
-          this.$message.error('User rejected sign');
-          this.$parent.close();
-          return;
-        }
-        this.signature = sign;
       }
     }
   },
@@ -234,7 +231,7 @@ export default {
 
   .records-btn {
     font-size: 16px;
-    width: 110px;
+    width: 120px;
   }
 }
 </style>
