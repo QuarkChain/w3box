@@ -156,7 +156,6 @@ export default {
     normalizeReq (file) {
       const { uid } = file;
       this.reqs[uid] = {
-        chunkLength: this.chunkLength,
         account: this.account,
         contractAddress: this.fileContract,
         fdContract: this.fdContract,

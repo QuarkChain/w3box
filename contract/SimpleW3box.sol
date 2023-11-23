@@ -632,4 +632,8 @@ contract SimpleW3box {
         UserInfo storage info = userInfos[msg.sender];
         return (info.addr, info.cipherIV, info.encrypt);
     }
+
+    function upfrontPayment() external view returns (uint256) {
+        return fileFD.upfrontPayment();
+    }
 }
