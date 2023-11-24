@@ -6,7 +6,7 @@
         <div class="profile-title">
           Files
         </div>
-        <el-button v-if="this.result&&this.result.length>0&&!isDelete" round class="profile-delete" @click="openDelete">
+        <el-button disabled v-if="this.result&&this.result.length>0&&!isDelete" round class="profile-delete" @click="openDelete">
           Delete multiple
         </el-button>
         <div v-if="isDelete">
@@ -49,7 +49,8 @@
             <span v-if="item.showProgress" class="go-upload-list-item-delete">
               <update-icon class="icon-loading" name="loading"></update-icon>
             </span>
-            <span v-else-if="!isDelete" class="go-upload-list-item-delete" @click="onDelete(item)">
+            <span v-else-if="!isDelete" class="go-upload-list-item-delete disabled-none">
+              <!--@click="onDelete(item)">-->
               <update-icon name="close"></update-icon>
             </span>
           </div>
@@ -83,12 +84,12 @@ export default {
       return this.$store.state.account;
     },
     aaAddress() {
-      return this.$store.state.aaAddress;
+      return this.$store.state.sessionAddr;
     },
   },
   watch: {
     aaAddress: function () {
-      if (this.$store.state.aaAddress) {
+      if (this.aaAddress) {
         this.onSearch();
       } else {
         this.result = [];
@@ -342,6 +343,11 @@ export default {
   cursor: pointer;
   padding: 15px;
 }
+.disabled-none {
+  pointer-events:none;
+  cursor: not-allowed;
+}
+
 .icon-loading {
   animation: rotating 2s infinite linear;
 }

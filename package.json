@@ -11,7 +11,6 @@
     "@ethereumjs/common": "^4.1.0",
     "@ethereumjs/tx": "^5.1.0",
     "@ethereumjs/util": "^9.0.0",
-    "@particle-network/aa": "^1.0.1",
     "axios": "^1.6.2",
     "bignumber.js": "^9.0.0",
     "buefy": "^0.9.17",

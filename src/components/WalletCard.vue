@@ -31,10 +31,12 @@
 </template>
 
 <script>
+const chain = 7011893061;
+
 import {mapActions} from "vuex";
 import {
   createSession, encryptSession,
-  querySessionKey, saveSessionKey
+  querySessionKey, saveSessionKey, signSeed
 } from "@/utils/Session";
 
 export default {
@@ -67,7 +69,7 @@ export default {
     this.initData();
   },
   methods: {
-    ...mapActions(["setSessionKey", "setSessionAddr"]),
+    ...mapActions(["setSessionKey", "setSessionAddr", "setSignature"]),
     async onRegister() {
       const password = this.input;
       if (!password) {
@@ -133,6 +135,15 @@ export default {
       } else {
         this.sessionResult = await querySessionKey(this.contract);
         this.created = this.sessionResult !== undefined;
+
+        if (!this.signature) {
+          const sign = await signSeed(this.account, chain);
+          if (!sign) {
+            this.$message.error('User rejected sign');
+            return;
+          }
+          this.setSignature(sign);
+        }
       }
     }
   },

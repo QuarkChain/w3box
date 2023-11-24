@@ -1,5 +1,5 @@
-import { FileContract } from "./contract";
-import { getTxReceipt, sendTx } from "@/utils/Particle";
+import {FileContract, FileContractSession} from "./contract";
+import {getSessionKey} from "@/utils/Session";
 
 // contract
 export const getUploadByAddress = async (controller, address) => {
@@ -27,20 +27,19 @@ export const getUploadByAddress = async (controller, address) => {
 }
 
 export const deleteFile = async (controller, account, file) => {
-    const fileContract = FileContract(controller);
-    const tx = await fileContract.populateTransaction.remove(account, file);
-    return send(tx);
+    let pk = getSessionKey(account);
+    pk = '0x' + Buffer.from(pk, 'base64').toString('hex');
+    const fileContract = await FileContractSession(controller, pk);
+    const tx = await fileContract.remove(account, file);
+    const receipt = tx.wait();
+    return receipt.status;
 }
 
 export const deleteFiles = async (controller, account, files) => {
-    const fileContract = FileContract(controller);
-    const tx = await fileContract.populateTransaction.removes(account, files);
-    return send(tx);
-}
-
-async function send(tx) {
-    const hash = await sendTx(tx);
-    console.log(`Transaction Id: ${hash}`);
-    const receipt = await getTxReceipt(hash);
+    let pk = getSessionKey(account);
+    pk = '0x' + Buffer.from(pk, 'base64').toString('hex');
+    const fileContract = await FileContractSession(controller, pk);
+    const tx = await fileContract.removes(account, files);
+    const receipt = tx.wait();
     return receipt.status;
 }
