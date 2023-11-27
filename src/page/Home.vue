@@ -3,7 +3,7 @@
     <img class="home-logo" src="../assets/home.png"/>
     <p class="title">
       The File Hosting Service on Devnet-11,<br/>
-      And use the SessionKey account to submit the transaction.
+      And use the Session Key account to submit the transaction.
     </p>
     <w3q-deployer multiple
                   :fileContract="contract"

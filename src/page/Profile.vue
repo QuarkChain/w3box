@@ -344,7 +344,6 @@ export default {
   padding: 15px;
 }
 .disabled-none {
-  pointer-events:none;
   cursor: not-allowed;
 }
 
