@@ -1,7 +1,7 @@
 <template>
   <el-card class="dialog_card">
     <div class="dialog_item">
-      <p class="item-title">SessionKey Account</p>
+      <p class="item-title">Session Key Account</p>
       <i class="el-icon-close item-close" @click="$parent.close()"/>
     </div>
     <el-card class="wallet-card">
@@ -17,11 +17,11 @@
     </el-card>
 
     <el-divider />
-    <div class="gas-title">Top up gas</div>
+    <div class="gas-title">Transfer gas fee</div>
     <div class="wallet-top-item gas-layout">
       <el-input class="item-input" placeholder="0.00 ETH" @input="didInputStakeAmount" v-model="input" />
       <el-button type="warning" round class="records-btn" :loading='progress' @click="onTransfer">
-        Top up
+        Transfer
       </el-button>
     </div>
   </el-card>
