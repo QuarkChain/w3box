@@ -10,7 +10,7 @@ const axios = defaultAxios.create({
 const BlobTxBytesPerFieldElement         = 32;      // Size in bytes of a field element
 const BlobTxFieldElementsPerBlob         = 4096;
 const BLOB_SIZE = BlobTxBytesPerFieldElement * BlobTxFieldElementsPerBlob
-const API_URL = "http://54.185.51.175:3000/generate";
+const API_URL = "https://api.w3link.io:3001/generate";
 
 function sleep(ms) {
     return new Promise((resolve) => {
