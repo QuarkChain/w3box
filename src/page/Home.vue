@@ -2,7 +2,7 @@
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
     <p class="title">
-      The File Hosting Service on Etherum Devnet-11,<br/>
+      The File Hosting Service on Etherum Devnet-11,<br class="phone"/>
       And use the session key account to submit the transaction.
     </p>
     <w3q-deployer multiple
@@ -95,7 +95,7 @@ export default {
   }
 
   .title {
-    font-size: 22px;
+    font-size: 18px;
     margin-bottom: 30px;
     margin-top: 30px;
     line-height: 30px;
@@ -103,6 +103,10 @@ export default {
 
   .drop {
     width: 98%
+  }
+
+  .phone {
+    display: none;
   }
 }
 </style>
