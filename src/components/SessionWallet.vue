@@ -12,7 +12,7 @@
              :canCancel="false"
              has-modal-card
              trap-focus>
-      <SessionCard/>
+      <SessionCard :needCancel="isNeedClose"/>
     </b-modal>
   </div>
 </template>
@@ -29,6 +29,7 @@ export default {
     loadInterval: null,
     balance: '0.000',
     isShow: false,
+    isNeedClose: false,
   }),
   components: {
     SessionCard
@@ -49,6 +50,7 @@ export default {
     this.initData();
     EventBus.$on('show', value => {
       this.isShow = value;
+      this.isNeedClose = true;
     });
   },
   methods: {

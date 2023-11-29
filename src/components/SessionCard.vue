@@ -35,7 +35,9 @@ const copy = require('clipboard-copy')
 
 export default {
   name: "SessionCardComponent",
-  props: ['canCancel'],
+  props: {
+    needCancel: Boolean,
+  },
   data: () => ({
     balance: '0.000',
     input: '',
@@ -131,6 +133,9 @@ export default {
           message: 'Transfer Success',
           type: 'success'
         });
+        if(this.needCancel) {
+          this.$parent.close();
+        }
       } else {
         this.$message.error('Transfer Fail!');
       }
