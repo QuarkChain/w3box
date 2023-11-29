@@ -2,7 +2,7 @@
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
     <p class="title">
-      The File Hosting Service on Etherum Devnet-11,<br class="phone"/>
+      The File Hosting Service on Etherum Devnet,<br class="phone"/>
       And use the session key account to submit the transaction.
     </p>
     <w3q-deployer multiple

@@ -11,7 +11,7 @@
       and controlled entirely by the address you are currently connected to.
     </div>
     <div v-if="!this.created" class="dialog-msg" style="margin-top: 10px">
-      Creating a Session account requires your authorization signature and submitting relevant information to the chain.
+      Creating a session key account requires your authorization signature and submitting relevant information to the chain.
     </div>
 
     <el-input v-if="!isLogined" class="input-password" type="password"
