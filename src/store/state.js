@@ -6,7 +6,7 @@ export const chains = [
 },
 {
   chainID: '0x1a1f0ff46',
-  FileBoxController: '0xD4e7f89A3b65fa0264901A0aaa586C1781dDB61D',
-  FDContract: '0x7baa39ce2b1c4F83F435Af56F6e0F98d9b7a98C2',
+  FileBoxController: '0xEc9F3Df59aC99D67d21169eFC6aA6e1e3d0D2F8D',
+  FDContract: '0x411c6cA54E2D9289B9E1D25f15da777819bcE86f',
 },
 ];
