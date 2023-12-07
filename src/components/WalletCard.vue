@@ -35,7 +35,7 @@
 </template>
 
 <script>
-const chain = 7011893061;
+const chain = 7011893062;
 
 import {mapActions} from "vuex";
 import {

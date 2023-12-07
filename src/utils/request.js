@@ -5,7 +5,7 @@ import {getSessionKey, queryBalance} from "@/utils/Session";
 
 const MAX_BLOB_COUNT = 3;
 const ENCODE_BLOB_SIZE = 31 * 4096;
-const JSON_RPC = "https://rpc.dencun-devnet-11.ethpandaops.io";
+const JSON_RPC = "https://rpc.dencun-devnet-12.ethpandaops.io";
 
 const stringToHex = (s) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(s));
 

@@ -36,10 +36,10 @@ export class UnsupportedChainIdError extends Error {
   }
 }
 
-const chain = 7011893061;
+const chain = 7011893062;
 const chainID = `0x${chain.toString(16)}`;
-const nodes = ['https://rpc.dencun-devnet-11.ethpandaops.io']
-const explorers = ['https://explorer.dencun-devnet-11.ethpandaops.io'];
+const nodes = ['https://rpc.dencun-devnet-12.ethpandaops.io']
+const explorers = ['https://explorer.dencun-devnet-12.ethpandaops.io'];
 
 export default {
   name: "WalletComponent",
@@ -75,7 +75,7 @@ export default {
     },
     connectWallet() {
       if (!window.ethereum) {
-        this.$message.error('Can\'t setup the Devnet-11 network on metamask because window.ethereum is undefined');
+        this.$message.error('Can\'t setup the Devnet-12 network on metamask because window.ethereum is undefined');
         return;
       }
       this.login();
