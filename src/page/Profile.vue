@@ -36,7 +36,9 @@
             <div style="display:flex;flex-direction: column;justify-content: space-between;align-items: flex-start; margin-left: 15px">
               <div>
                 <span class="go-upload-list-item-title">ID: </span>
-                <span class="go-upload-list-item-message">{{item.id}}</span>
+                <span class="go-upload-list-item-message">
+                  <a :href="idUrl(item.id)" target="_blank">{{ item.id }}</a>
+                </span>
               </div>
               <div>
                 <span class="go-upload-list-item-title">Name: </span>
@@ -48,7 +50,9 @@
               </div>
               <div>
                 <span class="go-upload-list-item-title">ipOrg: </span>
-                <span class="go-upload-list-item-message">{{ storyContract }}</span>
+                <span class="go-upload-list-item-message">
+                  <a :href="storyUrl" target="_blank">{{ stringShort(storyContract) }}</a>
+                </span>
               </div>
               <div>
                 <span class="go-upload-list-item-title">Media: </span>
@@ -109,6 +113,9 @@ export default {
       }
       return null;
     },
+    storyUrl() {
+      return "https://sepolia.etherscan.io/address/" + this.storyContract;
+    },
   },
   watch: {
     chainConfig: function () {
@@ -121,6 +128,9 @@ export default {
     this.onSearch();
   },
   methods: {
+    idUrl(id) {
+      return "https://sepolia.etherscan.io/token/" + this.storyContract + "?a="+id;
+    },
     stringShort(str) {
       if (str.length < 20) {
         return str;
