@@ -11,7 +11,7 @@ export const getUploadByAddress = async (controller, address) => {
     const urls = result[3];
     for (let i = 0; i < urls.length; i++) {
         const file = {
-            id: ids[i],
+            id: ids[i].toString(),
             time: new Date(parseInt(times[i], 10) * 1000),
             name: names[i],
             type: '0x',
@@ -23,6 +23,7 @@ export const getUploadByAddress = async (controller, address) => {
     files.sort(function (a, b) {
         return a.time - b.time
     });
+    console.log(files)
     return files;
 }
 
