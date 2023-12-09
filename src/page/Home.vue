@@ -4,7 +4,7 @@
     <p class="title">
       The File Hosting Service on Web3Q
     </p>
-    <w3q-deployer multiple :fileContract="contract" :account="account" class="drop"/>
+    <w3q-deployer multiple :contract="contract" :fileContract="fileContract" :account="account" class="drop"/>
   </div>
 </template>
 
@@ -19,6 +19,13 @@ export default {
       if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
         const {FileBoxController} = this.$store.state.chainConfig;
         return FileBoxController;
+      }
+      return null;
+    },
+    fileContract() {
+      if (this.$store.state.chainConfig && this.$store.state.chainConfig.chainID) {
+        const {FileContract} = this.$store.state.chainConfig;
+        return FileContract;
       }
       return null;
     },
