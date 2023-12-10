@@ -60,7 +60,7 @@ export default {
     ...mapActions(["setChainConfig", "setAccount"]),
     connectWallet() {
       if (!window.ethereum) {
-        this.$message.error('Can\'t setup the Web3Q network on metamask because window.ethereum is undefined');
+        this.$message.error('Can\'t setup the EthStorage network on metamask because window.ethereum is undefined');
         return;
       }
       this.login();
@@ -147,7 +147,7 @@ export default {
           return false
         }
       } else {
-        this.$message.error('Can\'t setup the Web3Q network on metamask because window.ethereum is undefined');
+        this.$message.error('Can\'t setup the EthStorage network on metamask because window.ethereum is undefined');
         return false
       }
     },
