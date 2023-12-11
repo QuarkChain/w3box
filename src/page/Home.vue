@@ -2,7 +2,7 @@
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
     <p class="title">
-      One-Stop Fully-Onchain IP on EthStorage
+      The File Hosting Service on EthStorage
     </p>
     <w3q-deployer multiple :fileContract="contract" :account="account" class="drop"/>
   </div>
