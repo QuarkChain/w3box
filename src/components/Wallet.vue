@@ -5,7 +5,7 @@
       v-if="!this.account"
       @click.stop="connectWallet"
     >
-      Login
+      Connect
     </button>
     <div v-else class="user">
       <div class="metamask" @click.stop="onOpenCreate">

@@ -2,8 +2,7 @@
   <div class="home">
     <img class="home-logo" src="../assets/home.png"/>
     <p class="title">
-      The File Hosting Service on EthStorage Devnet,<br class="phone"/>
-      And use the session key account to submit the transaction.
+      The File Hosting Service on EthStorage
     </p>
     <w3q-deployer multiple
                   :fileContract="contract"

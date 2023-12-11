@@ -1,17 +1,17 @@
 <template>
   <el-card class="dialog_card">
     <div class="dialog_item">
-      <p v-if="this.created" class="item-title">Login Session Key Account</p>
-      <p v-else class="item-title">Create Session Key Account</p>
+      <p v-if="this.created" class="item-title">Login Proxy Account</p>
+      <p v-else class="item-title">Create Proxy Account</p>
       <i class="el-icon-close item-close" @click="$parent.close()"/>
     </div>
 
     <div class="dialog-msg">
-      W3Box uses a session key account to upload files - this account is only stored locally
+      W3Box uses a proxy account to upload files - this account is only stored locally
       and controlled entirely by the address you are currently connected to.
     </div>
     <div v-if="!this.created" class="dialog-msg" style="margin-top: 10px">
-      Creating a session key account requires your authorization signature and submitting relevant information to the chain.
+      Creating a proxy account requires your authorization signature and submitting relevant information to the chain.
     </div>
 
     <el-input v-if="!isLogined" class="input-password" type="password"

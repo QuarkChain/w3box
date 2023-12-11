@@ -1,7 +1,7 @@
 <template>
   <el-card class="dialog_card">
     <div class="dialog_item">
-      <p class="item-title">Session Key Account</p>
+      <p class="item-title">Proxy Account</p>
       <i class="el-icon-close item-close" @click="$parent.close()"/>
     </div>
     <el-card class="wallet-card">
