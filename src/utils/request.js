@@ -1,6 +1,8 @@
 import { ethers } from "ethers";
 const sha3 = require('js-sha3').keccak_256;
 
+window.Buffer = window.Buffer || require("buffer").Buffer;
+
 const FileContractInfo = {
   abi: [
     "function writeChunk(bytes memory name, bytes memory fileType, uint256 chunkId, bytes calldata data) public payable",
