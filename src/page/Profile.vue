@@ -65,7 +65,7 @@ import UpdateIcon from "../components/icon";
 import {getUploadByAddress, deleteFile, deleteFiles} from '@/utils/profile';
 
 const copy = require('clipboard-copy')
-const hexToString = (h) => ethers.utils.toUtf8String(h);
+const hexToString = (h) => ethers.toUtf8String(h);
 
 export default {
   name: 'ProfileComponent',
